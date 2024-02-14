@@ -15,14 +15,20 @@ public class ActionButton {
 	private Point center;
 	private boolean active;
 	private boolean hidden;
+	private int width;
+	private int height;
 
 	public ActionButton(String title, Action action, Point center) {
+		this(title, action, center, BUTTON_WIDTH, BUTTON_HEIGHT);
+	}
+	
+	public ActionButton(String title, Action action, Point center, int width, int height) {
 		this.title = title;
 		this.action = action;
 		this.center = center;
-		if(Math.random() > 0) {
-			this.active = true;
-		}
+		
+		this.width = width;
+		this.height = height;
 	}
 	
 	public Action getAction() {
@@ -42,10 +48,10 @@ public class ActionButton {
 	}
 	
 	public boolean inRange(Point p) {
-		return p.getX() >= center.getX() - BUTTON_WIDTH / 2 &&
-				p.getY() >= center.getY() - BUTTON_HEIGHT / 2 &&
-				p.getX() <= center.getX() + BUTTON_WIDTH / 2 &&
-				p.getY() < center.getY() + BUTTON_HEIGHT / 2;
+		return p.getX() >= center.getX() - width / 2 &&
+				p.getY() >= center.getY() - height / 2 &&
+				p.getX() <= center.getX() + width / 2 &&
+				p.getY() < center.getY() + height / 2;
 	}
 	
 	
@@ -59,7 +65,7 @@ public class ActionButton {
 		} else {
 			g.setColor(GameColors.BUTTON_INACITVE_COLOR);
 		}
-		g.fillRoundRect((int) (center.getX() - BUTTON_WIDTH/2), (int) (center.getY() - BUTTON_HEIGHT/2), BUTTON_WIDTH, BUTTON_HEIGHT, 0, 0);
+		g.fillRoundRect((int) (center.getX() - width/2), (int) (center.getY() - height/2), width, height, 0, 0);
 		
 		if(this.active) {
 			g.setColor(Color.black);
@@ -68,7 +74,7 @@ public class ActionButton {
 		}
 		
 		g.setStroke(new BasicStroke(1));
-		g.drawRoundRect((int) (center.getX() - BUTTON_WIDTH/2), (int) (center.getY() - BUTTON_HEIGHT/2), BUTTON_WIDTH, BUTTON_HEIGHT, 0, 0);
+		g.drawRoundRect((int) (center.getX() - width/2), (int) (center.getY() - height/2), width, height, 0, 0);
 
 		Utils.drawCenteredString(g, title, center, BUTTON_FONT);
 		

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Table {
 
-	private ArrayList<Player> players;
+	private Party party;
 	private Player user;
 	private Board board;
 	private Dice dice;
@@ -14,23 +14,22 @@ public class Table {
 	private ActionButtonContainer buttonContainer;
 	
 	public Table(int numPlayers) {
+		if(numPlayers < 2 || numPlayers > 4) {
+			System.err.println("Invalid number of players");
+		}
+		
 		SetupManager setupManager = new SetupManager();
 		stateManager = new StateManager();
 		board = new Board(setupManager, stateManager);
 		dice = new Dice();
 		
-		
-		
-		players = new ArrayList<Player>();
-		for(int i = 0; i < numPlayers; i++) {
-			players.add(new Player(setupManager.getNextColor()));
-		}
-		user = players.get(0);
-		turnManager = new TurnManager(players);
+		party = new Party(numPlayers, setupManager);
+		turnManager = new TurnManager(party);
+		user = party.getUser();
 		
 		buttonContainer = new ActionButtonContainer();
-		
 		buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
+		party.validateTradeButtons(null);
 	}
 	
 	public Board getBoard() {
@@ -52,19 +51,42 @@ public class Table {
 		ActionButton button = this.buttonContainer.mouseClicked(p);
 		this.turnManager.getCurrentPlayer().mouseClicked(p, buttonContainer);
 		
+		Player toTradeWith = this.party.mouseClicked(p);
+		
 		if(cancelling(button)) {
 			wrapUp();
 			return true;
 		}
 		
 		if(boardClick != null) {
+			System.err.println(stateManager.getActionState());
 			switch(stateManager.getActionState()) {
+			case RollingForTurn:
+				if(button != null) {
+					handleButtonClick(button.getAction());
+				}
+				break;
 			case OponentsTurn:
+				return false;
+			case PreRoll:
+				if(button != null) {
+					handleButtonClick(button.getAction());
+					
+					// If we roll a 7 we SHOULD NOT wrapUp()
+					if(stateManager.getActionState() != ActionState.MovingRobber) {
+						wrapUp();
+					} 
+					
+					return true;
+				}
 				return false;
 			case YourTurn:
 				if(button != null) {
 					handleButtonClick(button.getAction());
 					return true;
+				}
+				if(toTradeWith != null) {
+					party.initiateTrade(turnManager.getCurrentPlayer(), toTradeWith);
 				}
 				return false;
 			case BuildingRoad:
@@ -157,7 +179,19 @@ public class Table {
 				}
 				break;
 			case RollDice:
-				rollDice();
+				if(this.stateManager.getActionState() == ActionState.RollingForTurn) {
+					this.turnManager.rollDiceForTurn(this.dice);
+					
+					if(this.turnManager.getCurrentPlayer() == user) {
+						this.stateManager.setActionState(ActionState.PreRoll);
+					} else {
+						this.stateManager.setActionState(ActionState.OponentsTurn);
+					}
+					
+				} else if(this.stateManager.getActionState() == ActionState.PreRoll) {
+					rollDice();
+					party.validateTradeButtons(turnManager.getCurrentPlayer());
+				}
 				break;
 			case ExchangeCards:
 				this.buttonContainer.showCancelButton();
@@ -167,8 +201,12 @@ public class Table {
 				break;
 			case DoneWithTurn:
 				this.stateManager.setActionState(ActionState.OponentsTurn);
-				this.buttonContainer.setAllInactive();
 				this.turnManager.nextPlayersTurn();
+				
+				buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
+				party.validateTradeButtons(null);
+				
+				
 				break;
 			default:
 				break;
@@ -180,9 +218,24 @@ public class Table {
 		this.user.draw(g);
 		this.buttonContainer.draw(g);
 		this.dice.draw(g);
+		this.party.draw(g, turnManager.getCurrentPlayer());
 	}
 	
-	
+	public void takeAITurnIfApplicable() {
+		if(stateManager.getActionState() == ActionState.OponentsTurn) {
+			Player p = turnManager.getCurrentPlayer();
+			if(p instanceof PlayerAI) {
+				if(((PlayerAI) p).takeTurn(board, dice)) {
+					System.out.println("Turn over");
+					turnManager.nextPlayersTurn();
+				}
+			} else {
+				stateManager.setActionState(ActionState.PreRoll);
+				buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
+				party.validateTradeButtons(null);
+			}
+		}
+	}
 	
 	private void rollDice() {
 		int diceRoll = this.dice.roll();

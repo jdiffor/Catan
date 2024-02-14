@@ -8,9 +8,10 @@ public class GameColors {
 	public static Color WHEAT_COLOR = new Color(165, 123, 1);
 	public static Color WOOD_COLOR = new Color(2, 107, 5);
 	
-	public static Color DESERT_COLOR = new Color(226, 219, 35);
+	public static Color DESERT_COLOR = new Color(232, 214, 142); //new Color(226, 219, 35);
 	public static Color WATER_COLOR = new Color(19, 50, 122);
 	public static Color TABLE_COLOR = new Color(99, 47, 1);
+	public static Color SAND_OUTLINE_COLOR = new Color(232, 214, 142);
 	
 	public static Color TILE_NUMBER_COLOR = new Color(239, 244, 168);
 	public static Color CARD_BORDER_COLOR = new Color(239, 244, 168);

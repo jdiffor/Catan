@@ -7,6 +7,7 @@ public enum Action {
 	PlayDevCard,
 	ExchangeCards,
 	RollDice,
+	Trade,
 	DoneWithTurn,
 	Cancel
 }

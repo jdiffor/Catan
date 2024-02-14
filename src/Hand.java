@@ -12,18 +12,14 @@ public class Hand {
 		this.handGui = new HandGui(this);
 		
 		cards.add(new ResourceCard(Resource.Bricks));
-		cards.add(new ResourceCard(Resource.Ore));
-		cards.add(new ResourceCard(Resource.Sheep));
-		cards.add(new ResourceCard(Resource.Wheat));
 		cards.add(new ResourceCard(Resource.Wood));
-		cards.add(new ResourceCard(Resource.Bricks));
-		cards.add(new ResourceCard(Resource.Ore));
 		cards.add(new ResourceCard(Resource.Wheat));
+		cards.add(new ResourceCard(Resource.Sheep));
 		cards.add(new ResourceCard(Resource.Ore));
-		cards.add(new ResourceCard(Resource.Wheat));
-		cards.add(new ResourceCard(Resource.Ore));
+	}
 	
-		sortCards();
+	public boolean isEmpty() {
+		return this.cards.size() == 0;
 	}
 	
 	public void mouseClicked(Point p) {
@@ -49,6 +45,14 @@ public class Hand {
 		for(ResourceCard card : cards) {
 			card.unSelect();
 		}
+	}
+	
+	public ResourceCard removeRandomCard() {
+		if(this.cards.size() == 0) {
+			return null;
+		}
+		
+		return cards.remove((int) (Math.random() * cards.size()));
 	}
 	
 	public boolean canBuildSettlement() {
@@ -109,8 +113,8 @@ public class Hand {
 	}
 	
 	public void buildDevCard() {
-		cards.remove(new ResourceCard(Resource.Bricks));
-		cards.remove(new ResourceCard(Resource.Wood));
+		cards.remove(new ResourceCard(Resource.Ore));
+		cards.remove(new ResourceCard(Resource.Wheat));
 		cards.remove(new ResourceCard(Resource.Sheep));
 		
 		sortCards();

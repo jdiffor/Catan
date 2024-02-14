@@ -50,7 +50,7 @@ public class ActionButtonContainer {
 	
 	public void validateButtons(Player player, Board board, StateManager sm, TurnManager tm) {
 		setAllInactive();
-		if(sm.getActionState() == ActionState.PreRoll) {
+		if(sm.getActionState() == ActionState.PreRoll || sm.getActionState() == ActionState.RollingForTurn) {
 			rollDiceButton.setActive(true);
 			// TODO: Activate play dev card if knight
 			return;
@@ -105,7 +105,7 @@ public class ActionButtonContainer {
 	private void validatePlayDevelopmentCard(Player player, TurnManager tm) {
 		boolean hasCards = player.hasUnplayedDevCard();
 		boolean nonePlayedYet = !tm.hasDevCardBeenPlayedThisTurn();
-		this.buildDevCardButton.setActive(hasCards && nonePlayedYet);
+		this.playDevCardButton.setActive(hasCards && nonePlayedYet);
 	}
 	
 	public void showCancelButton() {

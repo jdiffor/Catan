@@ -12,7 +12,13 @@ public class Dice {
 		this.diceGui = new DiceGui(this);
 	}
 	
-	public void draw(Graphics2D g) {
+	public Dice(Dice otherDice) {
+		this.d1 = otherDice.d1;
+		this.d2 = otherDice.d2;
+		this.diceGui = otherDice.diceGui;
+	}
+	
+	public void draw(Graphics2D g) {		
 		diceGui.draw(g);
 	}
 	

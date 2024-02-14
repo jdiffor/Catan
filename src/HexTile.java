@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class HexTile {
 
@@ -13,6 +14,8 @@ public class HexTile {
 	private Intersection seven;
 	private Intersection nine;
 	private Intersection eleven;
+	private Intersection[] intersections;
+	
 	private TileNumber tileNumber;
 	private Resource resource;
 	private boolean hasRobber;
@@ -34,6 +37,10 @@ public class HexTile {
 		if(this.resource != Resource.Desert) {
 			this.tileNumber = sm.getNextNumber();
 		}
+	}
+	
+	public void doneWithSetup() {
+		 intersections = new Intersection[]{one, three, five, seven, nine, eleven};
 	}
 	
 	public Pathway getTwelve() {
@@ -169,7 +176,6 @@ public class HexTile {
 			return;
 		}
 		
-		Intersection[] intersections = new Intersection[]{one, three, five, seven, nine, eleven};
 		for(Intersection i : intersections) {
 			if(i.hasStructure()) {
 				Structure s = i.getStructure();
@@ -183,5 +189,35 @@ public class HexTile {
 				}
 			}
 		}
+	}
+	
+	public int getNonPlayerOwnersCount(Player player) {
+		int count = 0;
+		for(Intersection i : intersections) {
+			if(i.hasStructure() && !i.getStructure().ownedBy(player)) {
+				count++;
+				
+				// Count 1 extra if city
+				if(i.getStructure() instanceof City) {
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+	
+	public ArrayList<Player> getNonPlayerOwners(Player player) {
+		ArrayList<Player> nonPlayerOwners = new ArrayList<Player>();
+		for(Intersection i : intersections) {
+			if(i.hasStructure() && !i.getStructure().ownedBy(player)) {
+				nonPlayerOwners.add(i.getStructure().getOwner());
+				
+				// Double count if they own a city
+				if(i.getStructure() instanceof City) {
+					nonPlayerOwners.add(i.getStructure().getOwner());
+				}
+			}
+		}
+		return nonPlayerOwners;
 	}
 }

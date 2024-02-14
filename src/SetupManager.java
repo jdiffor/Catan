@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 
 public class SetupManager {
 	
@@ -10,20 +9,38 @@ public class SetupManager {
 	private ArrayList<Color> colorPool;
 	
 	public SetupManager() {
-		this.resourcePool = createTilePool();
-		this.numberPool = createNumberPool();
 		this.colorPool = createColorPool();
 	}
 	
 	public HexTile[][] generateBoard() {
 		HexTile[][] board = new HexTile[Rules.BOARD_WIDTH][Rules.BOARD_HEIGHT]; 
-		for(int i = 0; i < board.length; i++) {
-			for(int j = 0; j < board[0].length; j++) {
-				if((i + j) % 2 == 0 && !Utils.isCorner(i, j, board)) {
-					board[i][j] = new HexTile(this);
+		boolean setupCorrectly = true;
+		
+		do {
+			this.resourcePool = createTilePool();
+			this.numberPool = createNumberPool();
+			setupCorrectly = true;
+			for(int i = 0; i < board.length; i++) {
+				for(int j = 0; j < board[0].length; j++) {
+					if((i + j) % 2 == 0 && !Utils.isCorner(i, j, board)) {
+						board[i][j] = new HexTile(this);
+						
+						if(board[i][j].getNumber() == 6 || board[i][j].getNumber() == 8) {
+							if(Utils.isInArrayRange(i-1, j-1, board) && board[i-1][j-1] != null && (board[i-1][j-1].getNumber() == 6 || board[i-1][j-1].getNumber() == 8)) {
+								setupCorrectly = false;
+							}
+							if(Utils.isInArrayRange(i-2, j, board) && board[i-2][j] != null && (board[i-2][j].getNumber() == 6 || board[i-2][j].getNumber() == 8)) {
+								setupCorrectly = false;
+							}
+							if(Utils.isInArrayRange(i-1, j+1, board) && board[i-1][j+1] != null && (board[i-1][j+1].getNumber() == 6 || board[i-1][j+1].getNumber() == 8)) {
+								setupCorrectly = false;
+							}
+						}
+						
+					}
 				}
 			}
-		}
+		} while(!setupCorrectly);
 		
 		for(int i = 0; i < board.length; i++) {
 			for(int j = 0; j < board[0].length; j++) {
@@ -33,6 +50,7 @@ public class SetupManager {
 					setIntersections(i, j, t, board);
 					addIntersectionsToPathways(i, j, t, board);
 					addPathwaysToIntersections(i, j, t, board);
+					t.doneWithSetup();
 				}
 			}
 		}
@@ -169,7 +187,7 @@ public class SetupManager {
 	public ArrayList<DevelopmentCard> createDevCardDeck() {
 		ArrayList<DevelopmentCard> devCards = new ArrayList<DevelopmentCard>();
 		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.Knight), 14, devCards);
-		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.RoadBuilding), 2, devCards);
+		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.RoadBuilding), 14, devCards);
 		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.YearOfPlenty), 2, devCards);
 		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.Monopoly), 2, devCards);
 		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.VictoryPoint), 5, devCards);

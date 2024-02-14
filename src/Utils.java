@@ -58,9 +58,29 @@ public class Utils {
 		}
 	}
 	
+	public static <T> ArrayList<T> array2DToList(T[][] arr, boolean removeNulls) {
+		ArrayList<T> list = new ArrayList<T>();
+		for(int i = 0; i < arr.length; i++) {
+			for(int j = 0; j < arr[0].length; j++) {
+				if(arr[i][j] != null || !removeNulls) {
+					list.add(arr[i][j]);
+				}
+			}
+		}
+		return list;
+	}
+	
 	public static void drawCenteredString(Graphics2D g, String text, Point p, Font font) {
 		FontMetrics metrics = g.getFontMetrics(font);
 		int x = (int) (p.getX() - metrics.stringWidth(text) / 2);
+		int y = (int) (p.getY() - metrics.getHeight() / 2 + metrics.getAscent());
+		g.setFont(font);
+		g.drawString(text, x, y);
+	}
+	
+	public static void drawCenteredHeightString(Graphics2D g, String text, Point p, Font font) {
+		FontMetrics metrics = g.getFontMetrics(font);
+		int x = (int) (p.getX());
 		int y = (int) (p.getY() - metrics.getHeight() / 2 + metrics.getAscent());
 		g.setFont(font);
 		g.drawString(text, x, y);
@@ -70,5 +90,17 @@ public class Utils {
 		return new Color((c1.getRed() + c2.getRed()) / 2,
 				(c1.getGreen() + c2.getGreen()) / 2,
 				(c1.getBlue() + c2.getBlue()) / 2);
+	}
+	
+	public static void wait(int millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static long time() {
+		return System.currentTimeMillis();
 	}
 }

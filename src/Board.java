@@ -1,9 +1,10 @@
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.ArrayList;
 
 public class Board {
 
-	private HexTile[][] boardTiles;
+	private ArrayList<HexTile> boardTiles;
 	private Robber robber;
 	private DevelopmentCardDeck devCardDeck;
 	
@@ -13,12 +14,12 @@ public class Board {
 	
 	public Board(SetupManager setupManager, StateManager stateManager) {
 		this.stateManager = stateManager;
-		this.boardTiles = setupManager.generateBoard();
-		this.robber = new Robber(findDesert()); 
 		this.devCardDeck = new DevelopmentCardDeck(setupManager);
 				
-		Utils.printArray2D(this.boardTiles);
-		this.boardGui = new BoardGui(this.boardTiles, stateManager);
+		HexTile[][] boardTileArray = setupManager.generateBoard();
+		this.boardGui = new BoardGui(boardTileArray, stateManager);
+		this.boardTiles = Utils.array2DToList(boardTileArray, true);
+		this.robber = new Robber(findDesert());
 	}
 	
 	public void draw(Graphics2D g) {
@@ -51,24 +52,22 @@ public class Board {
 		return this.devCardDeck;
 	}
 	
+	public ArrayList<HexTile> getBoardTiles() {
+		return this.boardTiles;
+	}
+	
 	public void distributeResources(int diceRoll) {
-		for(int i = 0; i < boardTiles.length; i++) {
-			for(int j = 0; j < boardTiles[0].length; j++) {
-				HexTile t = boardTiles[i][j];
-				if(t != null && t.getNumber() == diceRoll) {
-					t.distributeResources();
-				}
+		for(HexTile t : boardTiles) {
+			if(t.getNumber() == diceRoll) {
+				t.distributeResources();
 			}
 		}
 	}
 	
 	private HexTile findDesert() {
-		for(int i = 0; i < boardTiles.length; i++) {
-			for(int j = 0; j < boardTiles[0].length; j++) {
-				HexTile t = boardTiles[i][j];
-				if(t != null && t.getResource() == Resource.Desert) {
-					return t;
-				}
+		for(HexTile t : boardTiles) {
+			if(t.getResource() == Resource.Desert) {
+				return t;
 			}
 		}
 		return null;

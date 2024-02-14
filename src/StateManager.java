@@ -4,7 +4,7 @@ public class StateManager {
 	private ActionState actionState;
 	
 	public StateManager() {
-		this.actionState = ActionState.YourTurn;
+		this.actionState = ActionState.RollingForTurn;
 	}
 	
 	public void setActionState(ActionState s) {

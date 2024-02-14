@@ -26,6 +26,10 @@ public class PathwayGui {
 		}
 		
 		if(this.pathway.hasRoad()) {
+			g.setColor(Color.black);
+			g.setStroke(new BasicStroke((int) (BoardGui.BASE_SIZE * THICKNESS_RATIO * 1.4)));
+			g.drawLine((int) start.getX(), (int) start.getY(), (int) end.getX(), (int) end.getY());
+			
 			g.setColor(this.pathway.getRoad().getOwnerColor());
 			g.setStroke(new BasicStroke((int) (BoardGui.BASE_SIZE * THICKNESS_RATIO)));
 			g.drawLine((int) start.getX(), (int) start.getY(), (int) end.getX(), (int) end.getY());

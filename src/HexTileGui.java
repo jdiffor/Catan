@@ -103,9 +103,19 @@ public class HexTileGui {
 		
 		g.setColor(color);
 		g.fill(p);
-		g.setColor(hover ? Color.white : Color.black);
-		g.setStroke(new BasicStroke(3));
-		g.draw(p);
+		
+		if(hover) {
+			g.setColor(Color.black);
+			g.setStroke(new BasicStroke(12));
+			g.draw(p);
+			g.setColor(Color.white);
+			g.setStroke(new BasicStroke(6));
+			g.draw(p);
+		} else {
+			g.setColor(tile.getResource() == Resource.Water ? Color.black : GameColors.SAND_OUTLINE_COLOR);
+			g.setStroke(new BasicStroke(6));
+			g.draw(p);
+		}
 		
 		this.number.draw(g, center);
 		

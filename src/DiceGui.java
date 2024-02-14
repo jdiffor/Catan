@@ -9,8 +9,8 @@ public class DiceGui {
 	private static final int DIE_SIZE = 100;
 	private static final int DIE_ROUNDING = 20;
 	private static final int DIE_GAP = 10;
-	private static final int DIE_X = GameWindow.WINDOW_DIM.width - 2*(DIE_SIZE + DIE_GAP);
-	private static final int DIE_Y = GameWindow.WINDOW_DIM.height - (DIE_SIZE + DIE_GAP);;
+	private static final int DIE_X = DIE_GAP;
+	private static final int DIE_Y = DIE_GAP;
 	private final static Font DIE_FONT = new Font("Algerian", Font.BOLD, 48);
 	
 	private Dice dice;

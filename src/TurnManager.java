@@ -1,14 +1,15 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class TurnManager {
 
-	private ArrayList<Player> players;
+	private Party party;
 	private Player currentPlayer;
 	private boolean devCardPlayed;
 	
-	public TurnManager(ArrayList<Player> players) {
-		this.players = players;
-		currentPlayer = rollForFirst();
+	public TurnManager(Party party) {
+		this.party = party;
+		this.currentPlayer = party.getUser();
 	}
 	
 	public Player getCurrentPlayer() {
@@ -16,9 +17,7 @@ public class TurnManager {
 	}
 	
 	public Player nextPlayersTurn() {
-		int currentPlayerIndex = players.indexOf(currentPlayer) + 1;
-		currentPlayerIndex = currentPlayerIndex >= players.size() ? 0 : currentPlayerIndex;
-		currentPlayer = players.get(currentPlayerIndex);
+		currentPlayer = party.getNextPlayer(currentPlayer);
 		
 		devCardPlayed = false;
 		return currentPlayer;
@@ -32,7 +31,23 @@ public class TurnManager {
 		this.devCardPlayed = true;
 	}
 	
-	private Player rollForFirst() {
-		return players.get(0);
+	public void rollDiceForTurn(Dice dice) {
+		ArrayList<Integer> rolls = new ArrayList<Integer>();
+		
+		// User rolls dice and die roll is saved to paint on screen
+		rolls.add(dice.roll());
+		Dice userDice = new Dice(dice);
+		
+		int highest = 0;
+		for(int i = 1; i < party.size(); i++) {
+			int thisRoll = dice.roll();
+			if(thisRoll > highest) {
+				highest = thisRoll;
+			}
+			rolls.add(thisRoll);
+		}
+
+		this.currentPlayer = party.getPlayers().get(rolls.indexOf(highest));		
+		dice = userDice;
 	}
 }

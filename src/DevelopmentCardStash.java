@@ -3,13 +3,15 @@ import java.util.ArrayList;
 public class DevelopmentCardStash {
 
 	private ArrayList<DevelopmentCard> cards;
-	private HandGui handGui;
+	private DevelopmentCardStashGui devCardStashGui;
 	
 	public DevelopmentCardStash() {
 		cards = new ArrayList<DevelopmentCard>();
-		
-		cards.add(new DevelopmentCard(DevelopmentCardType.Knight));
-		cards.add(new DevelopmentCard(DevelopmentCardType.Monopoly));
+		devCardStashGui = new DevelopmentCardStashGui(this);
+	}
+	
+	public ArrayList<DevelopmentCard> getCards() {
+		return this.cards;
 	}
 	
 	public void addCard(DevelopmentCard card) {

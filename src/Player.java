@@ -9,13 +9,19 @@ public class Player {
 	private DevelopmentCardStash devCards;
 	private PieceRepository pieces;
 	private int freeSettlements;
+	private String name;
 	
-	public Player(Color color) {
+	public Player(Color color, String name) {
 		this.pieceColor = color;
 		this.hand = new Hand();
 		this.devCards = new DevelopmentCardStash();
 		this.pieces = new PieceRepository();
 		this.freeSettlements = 2;
+		this.name = name;
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 	
 	public Color getPieceColor() {
@@ -103,6 +109,13 @@ public class Player {
 	
 	public PieceRepository getPieces() {
 		return this.pieces;
+	}
+	
+	public static void rob(Player takeFrom, Player addTo) {
+		ResourceCard stolen = takeFrom.getHand().removeRandomCard();
+		if(stolen != null) {
+			addTo.getHand().addCardOfResourceType(stolen.getResource());
+		}
 	}
 	
 }

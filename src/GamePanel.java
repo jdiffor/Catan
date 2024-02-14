@@ -8,10 +8,11 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel implements Runnable {
 	
 	public static final double SCALE = 1;
-
+	private static final int AI_DELAY_TIME_IN_MILLIS = 1000;
+	
 	private Table table;
 	
 	public GamePanel(Table table) {
@@ -26,10 +27,7 @@ public class GamePanel extends JPanel {
 		
 		this.addMouseMotionListener(new MouseAdapter() {
 			public void mouseMoved(MouseEvent e) {
-				boolean shouldRepaint = table.mouseMoved(e.getPoint());
-				if(shouldRepaint) {
-					repaint();
-				}
+				table.mouseMoved(e.getPoint());
 			}
 		});
 		
@@ -43,7 +41,6 @@ public class GamePanel extends JPanel {
 				}
 				*/
 				table.mouseClicked(e.getPoint());
-				repaint();
 			}
 		});
 	}
@@ -54,6 +51,21 @@ public class GamePanel extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		this.table.draw(g2);
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		long prevTime = Utils.time();
+		while(true) {
+			if(Utils.time() - prevTime >= AI_DELAY_TIME_IN_MILLIS) {
+				table.takeAITurnIfApplicable();
+				prevTime = Utils.time();
+			}
+			
+			repaint();
+			Utils.wait(30);
+		}
 	}
 	
 }

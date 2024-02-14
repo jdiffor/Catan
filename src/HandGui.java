@@ -16,7 +16,7 @@ public class HandGui {
 	}
 	
 	public void mouseClicked(Point p) {
-		if(!inHandBounds(p)) {
+		if(!inHandBounds(p) || this.hand.isEmpty()) {
 			return;
 		}
 		
@@ -31,8 +31,11 @@ public class HandGui {
 	}
 	
 	public void draw(Graphics2D g) {
+		if(this.hand.isEmpty()) {
+			return;
+		}
+				
 		ArrayList<ResourceCard> cards = this.hand.getCards();
-		
 		int allowedWidth = HAND_WIDTH / cards.size();
 		int x = CONTAINER_START_X;
 		
