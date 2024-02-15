@@ -48,6 +48,21 @@ public class ActionButtonContainer {
 		}
 	}
 	
+	public void setButtonsForInitialSettlement() {
+		setAllInactive();
+		buildSettlementButton.setActive(true);
+	}
+	
+	public void setButtonsForInitialRoad() {
+		setAllInactive();
+		buildRoadButton.setActive(true);
+	}
+	
+	public void setButtonsForDoneWithInitialBuild() {
+		setAllInactive();
+		doneWithTurnButton.setActive(true);
+	}
+	
 	public void validateButtons(Player player, Board board, StateManager sm, TurnManager tm) {
 		setAllInactive();
 		if(sm.getActionState() == ActionState.PreRoll || sm.getActionState() == ActionState.RollingForTurn) {

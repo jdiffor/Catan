@@ -103,14 +103,13 @@ public class BoardGui {
 	 */
 	public boolean mouseMoved(Point p) {
 		switch(state.getActionState()) {
+			case BuildingInitialRoad:
 			case BuildingRoad:
 				return highlightHoveredPathway(p);
 			case MovingRobber:
 				return highlightHoveredTile(p);
 			case BuildingRegularSettlement:
-				return highlightHoveredIntersection(p);
 			case BuildingInitialSettlement:
-				return highlightHoveredIntersection(p);
 			case BuildingCity:
 				return highlightHoveredIntersection(p);
 			case YourTurn:
@@ -124,14 +123,13 @@ public class BoardGui {
 	 */
 	public BoardClickEvent mouseClicked(Point p) {
 		switch(state.getActionState()) {
+			case BuildingInitialRoad:
 			case BuildingRoad:
 				return new BoardClickEvent(clickPathway(p));
 			case MovingRobber:
 				return new BoardClickEvent(clickTile(p));
 			case BuildingRegularSettlement:
-				return new BoardClickEvent(clickIntersection(p));
 			case BuildingInitialSettlement:
-				return new BoardClickEvent(clickIntersection(p));
 			case BuildingCity:
 				return new BoardClickEvent(clickIntersection(p));
 			case YourTurn:

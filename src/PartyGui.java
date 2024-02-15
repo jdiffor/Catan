@@ -14,14 +14,18 @@ public class PartyGui {
 		for(int i = 0; i < party.size(); i++) {
 			playerGuis.add(new PlayerGui(party.get(i), i));
 		}
+		
+		disableAllTrades();
+		disableAllStealing();
 	}
 	
 	public Player mouseClicked(Point p) {
 		for(PlayerGui playerGui : playerGuis) {
-			if(playerGui.tradeButtonClicked(p)) {
-				System.out.println("clicked trade button");
+			if(playerGui.buttonClicked(p)) {
+				System.out.println("clicked player button");
 				return playerGui.getPlayer();
 			}
+			
 		}
 		return null;
 	}
@@ -34,16 +38,16 @@ public class PartyGui {
 	
 	public void disableAllTrades() {
 		for(PlayerGui playerGui : playerGuis) {
-			playerGui.setButtonAllowed(false);
+			playerGui.setTradeButtonAllowed(false);
 		}
 	}
 	
 	public void setAllOtherTradeButtons(Player p) {
 		for(PlayerGui playerGui : playerGuis) {
 			if(playerGui.getPlayer() == p) {
-				playerGui.setButtonAllowed(false);
+				playerGui.setTradeButtonAllowed(false);
 			} else {
-				playerGui.setButtonAllowed(true);
+				playerGui.setTradeButtonAllowed(true);
 			}
 		}
 	}
@@ -51,9 +55,23 @@ public class PartyGui {
 	public void setOnlyThisTradeButton(Player p) {
 		for(PlayerGui playerGui : playerGuis) {
 			if(playerGui.getPlayer() == p) {
-				playerGui.setButtonAllowed(true);
+				playerGui.setTradeButtonAllowed(true);
 			} else {
-				playerGui.setButtonAllowed(false);
+				playerGui.setTradeButtonAllowed(false);
+			}
+		}
+	}
+	
+	public void disableAllStealing() {
+		for(PlayerGui playerGui : playerGuis) {
+			playerGui.setStealButtonAllowed(false);
+		}
+	}
+	
+	public void setStealButton(Player p) {
+		for(PlayerGui playerGui : playerGuis) {
+			if(playerGui.getPlayer() == p) {
+				playerGui.setStealButtonAllowed(true);
 			}
 		}
 	}

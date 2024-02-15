@@ -37,4 +37,11 @@ public class Dice {
 		return this.d2;
 	}
 	
+	public static int combosForNumber(int number) {
+		if(number < 2 || number > 12) {
+			return 0;
+		}
+		 return 6 - Math.abs(number - 7);
+	}
+	
 }

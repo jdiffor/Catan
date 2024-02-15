@@ -10,12 +10,6 @@ public class Hand {
 	public Hand() {
 		cards = new ArrayList<ResourceCard>();
 		this.handGui = new HandGui(this);
-		
-		cards.add(new ResourceCard(Resource.Bricks));
-		cards.add(new ResourceCard(Resource.Wood));
-		cards.add(new ResourceCard(Resource.Wheat));
-		cards.add(new ResourceCard(Resource.Sheep));
-		cards.add(new ResourceCard(Resource.Ore));
 	}
 	
 	public boolean isEmpty() {
@@ -33,12 +27,19 @@ public class Hand {
 	}
 	
 	public void addCardOfResourceType(Resource r) {
+		if(r == Resource.Desert || r == Resource.Water) {
+			return;
+		}
 		cards.add(new ResourceCard(r));
 		sortCards();
 	}
 	
 	public ArrayList<ResourceCard> getCards() {
 		return this.cards;
+	}
+	
+	public int size() {
+		return this.cards.size();
 	}
 	
 	public void clearSelection() {

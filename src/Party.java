@@ -14,7 +14,7 @@ public class Party {
 		this.user = new Player(sm.getNextColor(), "User");
 		this.players.add(user);
 		
-		for(int i = 0; i < numPlayers - 1; i++) {
+		for(int i = 1; i < numPlayers; i++) {
 			players.add(new PlayerAI(sm.getNextColor(), "AI #" + i));
 		}
 		
@@ -26,6 +26,7 @@ public class Party {
 	}
 	
 	public void validateTradeButtons(Player currentPlayer) {
+		// TODO: hide if player has no cards
 		if(currentPlayer == null) {
 			partyGui.disableAllTrades();
 		} if(currentPlayer == user) {
@@ -33,6 +34,23 @@ public class Party {
 		} else {
 			partyGui.setOnlyThisTradeButton(currentPlayer);
 		}
+	}
+	
+	public int setPossiblePlayersToStealFrom(ArrayList<Player> playersOnRobbedTile) {
+		partyGui.disableAllStealing();
+		int countToRob = 0;
+		for(Player player : playersOnRobbedTile) {
+			if(player != user && player.getHand().size() > 0) {
+				partyGui.setStealButton(player);
+				countToRob++;
+			}
+		}
+		
+		return countToRob;
+	}
+	
+	public void doneStealing() {
+		partyGui.disableAllStealing();
 	}
 	
 	public int size() {

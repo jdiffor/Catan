@@ -20,10 +20,12 @@ public class PlayerGui {
 	private Player player;
 	private int playerNum;
 	private ActionButton tradeButton;
+	private ActionButton stealButton;
 	
 	public PlayerGui(Player player, int playerNum) {
 		this.player = player;
 		this.tradeButton = new ActionButton("Trade", Action.Trade, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), TRADE_BUTTON_WIDTH, TRADE_BUTTON_HEIGHT);
+		this.stealButton = new ActionButton("Steal", Action.Steal, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), TRADE_BUTTON_WIDTH, TRADE_BUTTON_HEIGHT);
 		this.playerNum = playerNum;
 	}
 	
@@ -55,23 +57,40 @@ public class PlayerGui {
 		
 		// Player name
 		g.setColor(Color.black);
-		Utils.drawCenteredHeightString(g, player.getName(), new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH + GAP), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
+		Utils.drawCenteredHeightString(g, player.getName() + "  -  " + player.getHand().size() + " cards", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH + GAP), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
 		
 		// Player score
+		int score = 2;
+		Utils.drawCenteredString(g, score + "", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH/2), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
 		
 		// Player number of cards
+		//Utils.drawCenteredHeightString(g, player.getHand().size() + " cards", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH + GAP), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
 		
-		// Trade button
+		// Buttons
 		this.tradeButton.draw(g);
+		this.stealButton.draw(g);
+	}
+	
+	public boolean buttonClicked(Point p) {
+		return this.tradeButtonClicked(p) || this.stealButtonClicked(p);
 	}
 	
 	public boolean tradeButtonClicked(Point p) {
 		return this.tradeButton.clicked(p);
 	}
 	
-	public void setButtonAllowed(boolean allowed) {
+	public boolean stealButtonClicked(Point p) {
+		return this.stealButton.clicked(p);
+	}
+	
+	public void setTradeButtonAllowed(boolean allowed) {
 		this.tradeButton.setActive(allowed);
 		this.tradeButton.setHidden(!allowed);
+	}
+	
+	public void setStealButtonAllowed(boolean allowed) {
+		this.stealButton.setActive(allowed);
+		this.stealButton.setHidden(!allowed);
 	}
 	
 }

@@ -29,7 +29,6 @@ public class Table {
 		
 		buttonContainer = new ActionButtonContainer();
 		buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
-		party.validateTradeButtons(null);
 	}
 	
 	public Board getBoard() {
@@ -51,7 +50,7 @@ public class Table {
 		ActionButton button = this.buttonContainer.mouseClicked(p);
 		this.turnManager.getCurrentPlayer().mouseClicked(p, buttonContainer);
 		
-		Player toTradeWith = this.party.mouseClicked(p);
+		Player playerToTradeWithOrStealFrom = this.party.mouseClicked(p);
 		
 		if(cancelling(button)) {
 			wrapUp();
@@ -64,6 +63,7 @@ public class Table {
 			case RollingForTurn:
 				if(button != null) {
 					handleButtonClick(button.getAction());
+					//this.buttonContainer.setAllInactive();
 				}
 				break;
 			case OponentsTurn:
@@ -75,7 +75,9 @@ public class Table {
 					// If we roll a 7 we SHOULD NOT wrapUp()
 					if(stateManager.getActionState() != ActionState.MovingRobber) {
 						wrapUp();
-					} 
+					} else {
+						this.party.validateTradeButtons(null);
+					}
 					
 					return true;
 				}
@@ -85,10 +87,13 @@ public class Table {
 					handleButtonClick(button.getAction());
 					return true;
 				}
-				if(toTradeWith != null) {
-					party.initiateTrade(turnManager.getCurrentPlayer(), toTradeWith);
+				
+				// Not stealing if YourTurn, must be trading
+				if(playerToTradeWithOrStealFrom != null) {
+					party.initiateTrade(turnManager.getCurrentPlayer(), playerToTradeWithOrStealFrom);
 				}
 				return false;
+				
 			case BuildingRoad:
 				if(pathway != null && pathway.validForRoad(turnManager.getCurrentPlayer())) {
 					if(turnManager.getCurrentPlayer().canBuildRoad()) {
@@ -98,13 +103,38 @@ public class Table {
 					}
 				}
 				return pathway != null;
-				
+			case BuildingInitialRoad:
+				if(pathway != null && pathway.validForRoad(turnManager.getCurrentPlayer())) {
+					if(turnManager.getCurrentPlayer().canBuildRoad()) {
+						turnManager.getCurrentPlayer().buildRoad(pathway);
+						buttonContainer.setButtonsForDoneWithInitialBuild();
+						stateManager.clearActionState();
+						return true;
+					}
+				}
 			case MovingRobber:
 				if(tile != null && board.canMoveRobberHere(tile)) {
-					board.moveRobberHere(tile);
-					wrapUp();
+					ArrayList<Player> playersOnRobbedTile = board.moveRobberHere(tile);
+					int countToRob = party.setPossiblePlayersToStealFrom(playersOnRobbedTile);
+					if(countToRob > 0) {
+						buttonContainer.setAllInactive();
+						stateManager.setActionState(ActionState.Stealing);
+					} else {
+						wrapUp();
+					}
+					
 					return true;
 				}
+				return false;
+				
+			case Stealing:
+				System.out.println(playerToTradeWithOrStealFrom);
+				if(playerToTradeWithOrStealFrom != null) {
+					Player.rob(playerToTradeWithOrStealFrom, turnManager.getCurrentPlayer());
+					party.doneStealing();
+				}
+				wrapUp();
+				
 				return false;
 				
 			case BuildingRegularSettlement:
@@ -121,7 +151,9 @@ public class Table {
 			case BuildingInitialSettlement:
 				if(intersection != null && intersection.validForSettlement(turnManager.getCurrentPlayer(), true)) {
 					turnManager.getCurrentPlayer().buildSettlement(intersection);
-					wrapUp();
+					//wrapUp();
+					buttonContainer.setButtonsForInitialRoad();
+					stateManager.clearActionState();
 					return true;
 				}
 				return false;
@@ -157,7 +189,7 @@ public class Table {
 			case Cancel:
 				// Currently this case is never reached because we return if cancelling from
 				// mouseClicked before calling handleButtonClick
-				this.stateManager.setActionState(ActionState.YourTurn);
+				this.stateManager.clearActionState();
 				this.buttonContainer.hideCancelButton();
 				this.turnManager.getCurrentPlayer().unSelectHand();
 			case BuildCity:
@@ -165,12 +197,23 @@ public class Table {
 				this.buttonContainer.showCancelButton();
 				break;
 			case BuildRoad:
-				this.stateManager.setActionState(ActionState.BuildingRoad);
-				this.buttonContainer.showCancelButton();
+				if(this.turnManager.inInitialBuildingPhase()) {
+					this.buttonContainer.setAllInactive();
+					this.stateManager.setActionState(ActionState.BuildingInitialRoad);
+				} else {
+					this.buttonContainer.showCancelButton();
+					this.stateManager.setActionState(ActionState.BuildingRoad);
+				}
+				
 				break;
 			case BuildSettlement:
-				this.stateManager.setActionState(ActionState.BuildingRegularSettlement);
-				this.buttonContainer.showCancelButton();
+				if(this.turnManager.inInitialBuildingPhase()) {
+					this.stateManager.setActionState(ActionState.BuildingInitialSettlement);
+					this.buttonContainer.setAllInactive();
+				} else {
+					this.stateManager.setActionState(ActionState.BuildingRegularSettlement);
+					this.buttonContainer.showCancelButton();
+				}
 				break;
 			case BuildDevCard:
 				if(turnManager.getCurrentPlayer().canBuildDevCard(board.getDevCardDeck())) {
@@ -183,9 +226,11 @@ public class Table {
 					this.turnManager.rollDiceForTurn(this.dice);
 					
 					if(this.turnManager.getCurrentPlayer() == user) {
-						this.stateManager.setActionState(ActionState.PreRoll);
+						this.stateManager.clearActionState();
+						this.buttonContainer.setButtonsForInitialSettlement();
 					} else {
 						this.stateManager.setActionState(ActionState.OponentsTurn);
+						this.buttonContainer.setAllInactive();
 					}
 					
 				} else if(this.stateManager.getActionState() == ActionState.PreRoll) {
@@ -230,9 +275,14 @@ public class Table {
 					turnManager.nextPlayersTurn();
 				}
 			} else {
-				stateManager.setActionState(ActionState.PreRoll);
-				buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
-				party.validateTradeButtons(null);
+				if(turnManager.inInitialBuildingPhase()) {
+					stateManager.clearActionState();
+					buttonContainer.setButtonsForInitialSettlement();
+				} else {
+					stateManager.setActionState(ActionState.PreRoll);
+					buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
+					party.validateTradeButtons(null);
+				}
 			}
 		}
 	}

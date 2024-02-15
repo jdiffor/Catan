@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class SetupManager {
 	
@@ -50,12 +51,18 @@ public class SetupManager {
 					setIntersections(i, j, t, board);
 					addIntersectionsToPathways(i, j, t, board);
 					addPathwaysToIntersections(i, j, t, board);
-					t.doneWithSetup();
+					addHexTilesToIntersections(t);
 				}
 			}
 		}
 		
 		return board;		
+	}
+	
+	private void addHexTilesToIntersections(HexTile tile) {
+		for(Intersection i : tile.getIntersections()) {
+			i.addHexTile(tile);
+		} 		
 	}
 	
 	private void setPathways(int i, int j, HexTile t, HexTile[][] arr) {
@@ -121,6 +128,8 @@ public class SetupManager {
 			arr[i+1][j+1].setEleven(t.getThree());
 			arr[i+1][j+1].setNine(t.getFive());
 		}
+		
+		t.doneAddingIntersections();
 	}
 	
 	private void addIntersectionsToPathways(int i, int j, HexTile t, HexTile[][] arr) {

@@ -39,7 +39,7 @@ public class HexTile {
 		}
 	}
 	
-	public void doneWithSetup() {
+	public void doneAddingIntersections() {
 		 intersections = new Intersection[]{one, three, five, seven, nine, eleven};
 	}
 	
@@ -137,6 +137,10 @@ public class HexTile {
 
 	public void setEleven(Intersection eleven) {
 		this.eleven = eleven;
+	}
+	
+	public Intersection[] getIntersections() {
+		return this.intersections;
 	}
 	
 	public int getNumber() {

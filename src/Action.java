@@ -8,6 +8,7 @@ public enum Action {
 	ExchangeCards,
 	RollDice,
 	Trade,
+	Steal,
 	DoneWithTurn,
 	Cancel
 }

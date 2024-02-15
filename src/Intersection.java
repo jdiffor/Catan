@@ -1,11 +1,14 @@
+import java.util.ArrayList;
 
 public class Intersection {
 
 	private Pathway[] pathways;
 	private Structure structure;
+	private ArrayList<HexTile> hexTiles;
 	
 	public Intersection() {
 		this.pathways = new Pathway[3];
+		this.hexTiles = new ArrayList<HexTile>();
 	}
 	
 	public void addPathway(Pathway p) {
@@ -22,12 +25,36 @@ public class Intersection {
 		}
 	}
 	
+	public void addHexTile(HexTile tile) {
+		this.hexTiles.add(tile);
+	}
+	
+	public ArrayList<HexTile> getHexTiles() {
+		return this.hexTiles;
+	}
+	
 	public boolean hasStructure() {
 		return this.structure != null;
 	}
 	
 	public Structure getStructure() {
 		return this.structure;
+	}
+	
+	public ArrayList<Pathway> getPathways() {
+		ArrayList<Pathway> pathwayList = new ArrayList<Pathway>();
+		if(pathways[0] != null) {
+			pathwayList.add(pathways[0]);
+		}
+		
+		if(pathways[1] != null) {
+			pathwayList.add(pathways[1]);
+		}
+		
+		if(pathways[2] != null) {
+			pathwayList.add(pathways[2]);
+		}
+		return pathwayList;
 	}
 	
 	public void buildSettlement(Player player) {

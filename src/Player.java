@@ -8,8 +8,8 @@ public class Player {
 	private Hand hand;
 	private DevelopmentCardStash devCards;
 	private PieceRepository pieces;
-	private int freeSettlements;
 	private String name;
+	protected int freeSettlements;
 	
 	public Player(Color color, String name) {
 		this.pieceColor = color;
@@ -83,7 +83,12 @@ public class Player {
 	public void buildSettlement(Intersection intersection) {
 		if(freeSettlements == 0) {
 			this.hand.buildSettlement();
+		} else if(freeSettlements == 1) {
+			for(HexTile tile : intersection.getHexTiles()) {
+				this.hand.addCardOfResourceType(tile.getResource());
+			}
 		}
+		
 		this.pieces.useSettlement();
 		intersection.buildSettlement(this);
 	}

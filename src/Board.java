@@ -42,10 +42,18 @@ public class Board {
 		return this.robber.getCurrentTile() != tile;
 	}
 	
-	public void moveRobberHere(HexTile tile) {
+	public ArrayList<Player> moveRobberHere(HexTile tile) {
 		this.robber.getCurrentTile().removeRobber();
 		tile.addRobber();
 		robber.moveTo(tile);
+		
+		ArrayList<Player> playersOnRobbedTile = new ArrayList<Player>();
+		for(Intersection i : tile.getIntersections()) {
+			if(i.hasStructure()) {
+				playersOnRobbedTile.add(i.getStructure().getOwner());
+			}
+		}
+		return playersOnRobbedTile;
 	}
 	
 	public DevelopmentCardDeck getDevCardDeck() {

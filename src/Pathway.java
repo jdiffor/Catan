@@ -31,6 +31,10 @@ public class Pathway {
 		return false;
 	}
 	
+	public Intersection getOtherIntersection(Intersection i) {
+		return intersections[1] == i ? intersections[0] : intersections[1];
+	}
+	
 	public boolean hasRoad() {
 		return this.road != null;
 	}
