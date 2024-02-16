@@ -214,6 +214,7 @@ public class SetupManager {
 		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.YearOfPlenty), 2, devCards);
 		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.Monopoly), 2, devCards);
 		Utils.addAmountOfItemToList(new DevelopmentCard(DevelopmentCardType.VictoryPoint), 5, devCards);
+		Collections.shuffle(devCards);
 		return devCards;
 	}
 	

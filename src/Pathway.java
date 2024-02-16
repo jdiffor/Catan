@@ -36,7 +36,6 @@ public class Pathway {
 	}
 	
 	public boolean validForRoad(Player player) {
-		
 		for(int i = 0; i < intersections.length; i++) {
 			if(intersections[i] != null && intersections[i].playerCanBuildRoadFrom(player)) {
 				// If player is building an initial road, make sure it touches most recent settlement
@@ -52,6 +51,7 @@ public class Pathway {
 			}
 		}
 		return false;
+		
 	}
 	
 	public Intersection getOtherIntersection(Intersection i) {

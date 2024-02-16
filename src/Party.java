@@ -89,4 +89,16 @@ public class Party {
 		System.out.println(offering.getName() + " offers " + beingOffered.getName() + " a trade");
 	}
 	
+	// Return true if game over, false otherwise
+	public boolean updateScores(Board board) {
+		int highScore = 0;
+		for(Player player : players) {
+			int score = player.calculateScore(board);			
+			
+			highScore = score > highScore ? score : score;
+		}
+		
+		return highScore >= 10;
+	}
+	
 }

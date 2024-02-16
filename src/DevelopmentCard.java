@@ -13,8 +13,8 @@ public class DevelopmentCard extends Card {
 		return this.type;
 	}
 	
-	public boolean upPlayed() {
-		return !this.played;
+	public boolean played() {
+		return this.played;
 	}
 	
 }

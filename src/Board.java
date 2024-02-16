@@ -11,6 +11,9 @@ public class Board {
 	private BoardGui boardGui;
 	private StateManager stateManager;
 	
+	private static int longestRoadLength = 4;
+	private static Player longestRoadOwner = null;
+	
 	
 	public Board(SetupManager setupManager, StateManager stateManager) {
 		this.stateManager = stateManager;
@@ -94,7 +97,7 @@ public class Board {
 		return false;
 	}
 	
-	public boolean canBuildRoadSomewhere(Player player ) {
+	public boolean canBuildRoadSomewhere(Player player) {
 		for(HexTile tile : boardTiles) {
 			for(Intersection intersection : tile.getIntersections()) {
 				for(Pathway pathway : intersection.getPathways()) {
@@ -105,6 +108,54 @@ public class Board {
 			}
 		}
 		return false;
+	}
+	
+	public int getPoints(Player player) {
+		ArrayList<Intersection> accountedFor = new ArrayList<Intersection>();
+		int points = 0;
+		
+		for(HexTile tile : boardTiles) {
+			for(Intersection intersection : tile.getIntersections()) {
+				if(!accountedFor.contains(intersection) && intersection.hasStructure() && intersection.getStructure().getOwner() == player) {
+					points++;
+					if(intersection.getStructure() instanceof City) {
+						points++;
+					}
+					accountedFor.add(intersection);
+				}
+				
+				int roadLength = longestRoadFrom(player, intersection, null);
+				if(roadLength > longestRoadLength) {
+					longestRoadLength = roadLength;
+					longestRoadOwner = player;
+				}
+			}
+		}
+		
+		if(player == longestRoadOwner) {
+			points += 2;
+		}
+		
+		System.out.println(longestRoadLength);
+		
+		return points;
+	}
+	
+	private int longestRoadFrom(Player player, Intersection intersection, ArrayList<Pathway> visited) {
+		System.out.println(visited == null);
+		if(visited == null) {
+			visited = new ArrayList<Pathway>();
+		}
+		
+		int max = 0;
+		for(Pathway pathway : intersection.getPathways()) {
+			if(!visited.contains(pathway) && pathway.hasRoad() && pathway.getRoad().getOwner() == player) {
+				visited.add(pathway);
+				int length = longestRoadFrom(player, pathway.getOtherIntersection(intersection), visited) + 1;
+				max = length > max ? length : max;
+			}
+		}
+		return max;
 	}
 	
 	private HexTile findDesert() {

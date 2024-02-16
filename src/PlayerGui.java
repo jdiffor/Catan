@@ -60,7 +60,7 @@ public class PlayerGui {
 		Utils.drawCenteredHeightString(g, player.getName() + "  -  " + player.getHand().size() + " cards", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH + GAP), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
 		
 		// Player score
-		int score = 2;
+		int score = player.getScore();
 		Utils.drawCenteredString(g, score + "", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH/2), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
 		
 		// Player number of cards

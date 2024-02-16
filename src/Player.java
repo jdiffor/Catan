@@ -10,6 +10,7 @@ public class Player {
 	private DevelopmentCardStash devCards;
 	private PieceRepository pieces;
 	private String name;
+	protected int score;
 	protected int freeSettlements;
 	protected Intersection lastInitialSettlement;
 	protected ArrayList<HarborType> tradeDeals;
@@ -113,7 +114,9 @@ public class Player {
 	
 	public void buildDevelopmentCard(DevelopmentCardDeck deck) {
 		this.hand.buildDevCard();
-		this.devCards.addCard(deck.drawCard());
+		DevelopmentCard d = deck.drawCard();
+		System.out.println(d.getType());
+		this.devCards.addCard(d);
 	}
 	
 	public Hand getHand() {
@@ -140,13 +143,6 @@ public class Player {
 		return false;
 	}
 	
-	public static void rob(Player takeFrom, Player addTo) {
-		ResourceCard stolen = takeFrom.getHand().removeRandomCard();
-		if(stolen != null) {
-			addTo.getHand().addCardOfResourceType(stolen.getResource());
-		}
-	}
-	
 	public boolean hasInitialSettlementLeft() {
 		return this.freeSettlements > 0;
 	}
@@ -154,6 +150,25 @@ public class Player {
 	public boolean isLastInitialSettlementLocation(Intersection intersection) {
 		System.out.println(lastInitialSettlement);
 		return intersection == lastInitialSettlement;
+	}
+	
+	public int calculateScore(Board board) {
+		int devCardPoints = this.devCards.getPoints(this);
+		int boardPoints = board.getPoints(this);
+		
+		this.score = devCardPoints + boardPoints;
+		return this.score;
+	}
+	
+	public int getScore() {
+		return this.score;
+	}
+	
+	public static void rob(Player takeFrom, Player addTo) {
+		ResourceCard stolen = takeFrom.getHand().removeRandomCard();
+		if(stolen != null) {
+			addTo.getHand().addCardOfResourceType(stolen.getResource());
+		}
 	}
 	
 }

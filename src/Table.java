@@ -43,7 +43,7 @@ public class Table {
 	}
 	
 	
-	public boolean mouseClicked(Point p) {
+	public void mouseClicked(Point p) {
 		System.out.println(p);
 		BoardClickEvent boardClick = this.board.mouseClicked(p);
 		Intersection intersection = boardClick.getIntersection();
@@ -66,7 +66,7 @@ public class Table {
 		
 		if(cancelling(button)) {
 			wrapUp();
-			return true;
+			return;
 		}
 		
 		if(boardClick != null) {
@@ -79,7 +79,7 @@ public class Table {
 				}
 				break;
 			case OponentsTurn:
-				return false;
+				break;
 			case PreRoll:
 				if(button != null) {
 					handleButtonClick(button.getAction());
@@ -90,31 +90,28 @@ public class Table {
 					} else {
 						this.party.validateTradeButtons(null);
 					}
-					
-					return true;
 				}
-				return false;
+				break;
 			case YourTurn:
 				if(button != null) {
 					handleButtonClick(button.getAction());
-					return true;
+					break;
 				}
 				
 				// Not stealing if YourTurn, must be trading
 				if(playerToTradeWithOrStealFrom != null) {
 					party.initiateTrade(turnManager.getCurrentPlayer(), playerToTradeWithOrStealFrom);
 				}
-				return false;
+				break;
 				
 			case BuildingRoad:
 				if(pathway != null && pathway.validForRoad(turnManager.getCurrentPlayer())) {
 					if(turnManager.getCurrentPlayer().canBuildRoad()) {
 						turnManager.getCurrentPlayer().buildRoad(pathway);
 						wrapUp();
-						return true;
 					}
 				}
-				return pathway != null;
+				break;
 			case BuildingInitialRoad:
 				if(pathway != null && pathway.validForRoad(turnManager.getCurrentPlayer())) {
 					if(turnManager.getCurrentPlayer().canBuildRoad()) {
@@ -122,9 +119,9 @@ public class Table {
 						buttonContainer.setButtonsForDoneWithInitialBuild();
 						stateManager.clearActionState();
 						board.clearHover();
-						return true;
 					}
 				}
+				break;
 			case MovingRobber:
 				if(tile != null && board.canMoveRobberHere(tile)) {
 					ArrayList<Player> playersOnRobbedTile = board.moveRobberHere(tile);
@@ -135,10 +132,8 @@ public class Table {
 					} else {
 						wrapUp();
 					}
-					
-					return true;
 				}
-				return false;
+				break;
 				
 			case Stealing:
 				if(playerToTradeWithOrStealFrom != null) {
@@ -146,18 +141,16 @@ public class Table {
 					party.doneStealing();
 					wrapUp();
 				}				
-				return false;
+				break;
 				
 			case BuildingRegularSettlement:
 				if(intersection != null && intersection.validForSettlement(turnManager.getCurrentPlayer())) {
 					if(turnManager.getCurrentPlayer().canBuildSettlement()) {
 						turnManager.getCurrentPlayer().buildSettlement(intersection);
 						wrapUp();
-						
-						return true;
 					}
 				}
-				return false;
+				break;
 				
 			case BuildingInitialSettlement:
 				if(intersection != null && intersection.validForSettlement(turnManager.getCurrentPlayer())) {
@@ -166,19 +159,17 @@ public class Table {
 					board.clearHover();
 					buttonContainer.setButtonsForInitialRoad();
 					stateManager.clearActionState();
-					return true;
 				}
-				return false;
+				break;
 				
 			case BuildingCity:
 				if(intersection != null && intersection.validForCity(turnManager.getCurrentPlayer())) {
 					if(turnManager.getCurrentPlayer().canBuildCity()) {
 						turnManager.getCurrentPlayer().buildCity(intersection);
 						wrapUp();
-						return true;
 					}
 				}
-				return false;
+				break;
 				
 			case ExchangingCards:
 				if(resourceFromExchange != null) {
@@ -186,14 +177,14 @@ public class Table {
 						wrapUp();
 					}
 				}
-				return true;
+				break;
 			
 			default:
-				return false;
+				break;
 			}
 		}
 		
-		return false;
+		party.updateScores(board);
 	}
 	
 	private void handleButtonClick(Action action) {
@@ -305,6 +296,8 @@ public class Table {
 					party.validateTradeButtons(null);
 				}
 			}
+			
+			party.updateScores(board);
 		}
 	}
 	
