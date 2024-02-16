@@ -101,17 +101,19 @@ public class BoardGui {
 	/*
 	 * Returns true if we should repaint
 	 */
-	public boolean mouseMoved(Point p) {
+	public boolean mouseMoved(Point p, Player player) {
 		switch(state.getActionState()) {
 			case BuildingInitialRoad:
 			case BuildingRoad:
-				return highlightHoveredPathway(p);
+				return highlightHoveredPathway(p, player);
 			case MovingRobber:
 				return highlightHoveredTile(p);
 			case BuildingRegularSettlement:
+				return highlightHoveredIntersectionForSettlement(p, player);
 			case BuildingInitialSettlement:
+				return highlightHoveredIntersectionForSettlement(p, player);
 			case BuildingCity:
-				return highlightHoveredIntersection(p);
+				return highlightHoveredIntersectionForCity(p, player);
 			case YourTurn:
 			default:
 				return false;
@@ -167,15 +169,7 @@ public class BoardGui {
 			}
 		}
 		
-		if(shortestDist > TILE_WIDTH / 2) {
-			if(hoverTile != null) {
-				hoverTile.removeHover();
-			}
-			hoverTile = null;
-			return true;
-		}
-		
-		if(closestTile != null && closestTile != hoverTile) {
+		if(shortestDist <= TILE_WIDTH / 2 && closestTile != null && !closestTile.getHexTile().hasRobber()) {
 			if(hoverTile != null) {
 				hoverTile.removeHover();
 			}
@@ -183,12 +177,19 @@ public class BoardGui {
 			hoverTile = closestTile;
 			return true;
 		}
+		
+		if(hoverTile != null) {
+			hoverTile.removeHover();
+			hoverTile = null;
+			return true;
+		}
+		
 		return false;
 	}
 	
-	private boolean highlightHoveredIntersection(Point p) {
+	private boolean highlightHoveredIntersectionForSettlement(Point p, Player player) {
 		for(IntersectionGui intersection : intersections) {
-			if(intersection.inRange(p)) {
+			if(intersection.inRange(p) && intersection.getIntersection().validForSettlement(player)) {
 				if(hoverIntersection != null) {
 					hoverIntersection.removeHover();	
 				}
@@ -205,7 +206,26 @@ public class BoardGui {
 		return false;
 	}
 	
-	private boolean highlightHoveredPathway(Point p) {
+	private boolean highlightHoveredIntersectionForCity(Point p, Player player) {
+		for(IntersectionGui intersection : intersections) {
+			if(intersection.inRange(p) && intersection.getIntersection().validForCity(player)) {
+				if(hoverIntersection != null) {
+					hoverIntersection.removeHover();	
+				}
+				intersection.addHover();
+				hoverIntersection = intersection;
+				return true;
+			}
+		}
+		if(hoverIntersection != null) {
+			hoverIntersection.removeHover();
+			hoverIntersection = null;
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean highlightHoveredPathway(Point p, Player player) {
 		double shortestDist = Double.MAX_VALUE;
 		PathwayGui closestPathway = null;
 		for(PathwayGui path : pathways) {
@@ -216,15 +236,7 @@ public class BoardGui {
 			}
 		}
 		
-		if(shortestDist > TILE_WIDTH / 4) {
-			if(hoverPathway != null) {
-				hoverPathway.removeHover();
-			}
-			hoverPathway = null;
-			return true;
-		}
-		
-		if(closestPathway != null && closestPathway != hoverPathway) {
+		if(shortestDist <= TILE_WIDTH / 4 && closestPathway != null && closestPathway.getPathway().validForRoad(player)) {
 			if(hoverPathway != null) {
 				hoverPathway.removeHover();
 			}
@@ -232,6 +244,13 @@ public class BoardGui {
 			hoverPathway = closestPathway;
 			return true;
 		}
+		
+		if(hoverPathway != null) {
+			hoverPathway.removeHover();
+			hoverPathway = null;
+			return true;
+		}
+		
 		return false;
 	}
 	

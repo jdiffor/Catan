@@ -87,27 +87,27 @@ public class ActionButtonContainer {
 	}
 	
 	public void validateExchangeCardsButton(Player player) {
-		this.exchangeCardsButton.setActive(player.getHand().canExchangeSelectedCards());
+		this.exchangeCardsButton.setActive(player.canExchangeSelectedCards());
 	}
 	
 	private void validateBuildRoadButton(Player player, Board board) {
 		boolean hasCards = player.getHand().canBuildRoad();
 		boolean hasPieces = player.getPieces().hasRoad();
-		boolean hasLocation = true; // TODO: implement
+		boolean hasLocation = board.canBuildRoadSomewhere(player);
 		this.buildRoadButton.setActive(hasCards && hasPieces && hasLocation);
 	}
 	
 	private void validateBuildSettlementButton(Player player, Board board) {
 		boolean hasCards = player.getHand().canBuildSettlement();
 		boolean hasPieces = player.getPieces().hasSettlement();
-		boolean hasLocation = true; // TODO: implement
+		boolean hasLocation = board.canBuildSettlementSomewhere(player);
 		this.buildSettlementButton.setActive(hasCards && hasPieces && hasLocation);
 	}
 	
 	private void validateBuildCityButton(Player player, Board board) {
 		boolean hasCards = player.getHand().canBuildCity();
 		boolean hasPieces = player.getPieces().hasCity();
-		boolean hasLocation = true; // TODO: implement
+		boolean hasLocation = board.canBuildSettlementSomewhere(player);
 		this.buildCityButton.setActive(hasCards && hasPieces && hasLocation);
 	}
 	

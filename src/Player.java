@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.ArrayList;
 
 public class Player {
 
@@ -10,6 +11,8 @@ public class Player {
 	private PieceRepository pieces;
 	private String name;
 	protected int freeSettlements;
+	protected Intersection lastInitialSettlement;
+	protected ArrayList<HarborType> tradeDeals;
 	
 	public Player(Color color, String name) {
 		this.pieceColor = color;
@@ -18,6 +21,7 @@ public class Player {
 		this.pieces = new PieceRepository();
 		this.freeSettlements = 2;
 		this.name = name;
+		this.tradeDeals = new ArrayList<HarborType>();
 	}
 	
 	public String getName() {
@@ -50,7 +54,7 @@ public class Player {
 	}
 	
 	public boolean canBuildSettlement() {
-		return this.pieces.hasSettlement() && (freeSettlements > 0 || this.hand.canBuildSettlement());
+		return this.pieces.hasSettlement() && (hasInitialSettlementLeft() || this.hand.canBuildSettlement());
 	}
 	
 	public boolean canBuildCity() {
@@ -58,7 +62,7 @@ public class Player {
 	}
 	
 	public boolean canBuildRoad() {
-		return this.pieces.hasRoad() && (freeSettlements > 0 || this.hand.canBuildRoad());
+		return this.pieces.hasRoad() && (hasInitialSettlementLeft() || this.hand.canBuildRoad());
 	}
 	
 	public boolean canBuildDevCard(DevelopmentCardDeck deck) {
@@ -68,20 +72,20 @@ public class Player {
 	public void buildRoad(Pathway pathway) {
 		System.out.println("Building road");
 		
-		if(freeSettlements == 0) {
+		if(!hasInitialSettlementLeft()) {
 			this.hand.buildRoad();
 		}
 		this.pieces.useRoad();
 		pathway.buildRoad(this);
 		
 		//Use up free settlement after building road for settlement
-		if(freeSettlements > 0) {
+		if(hasInitialSettlementLeft()) {
 			freeSettlements--;
 		}
 	}
 	
 	public void buildSettlement(Intersection intersection) {
-		if(freeSettlements == 0) {
+		if(!hasInitialSettlementLeft()) {
 			this.hand.buildSettlement();
 		} else if(freeSettlements == 1) {
 			for(HexTile tile : intersection.getHexTiles()) {
@@ -91,6 +95,14 @@ public class Player {
 		
 		this.pieces.useSettlement();
 		intersection.buildSettlement(this);
+		
+		if(hasInitialSettlementLeft()) {
+			this.lastInitialSettlement = intersection;
+		}
+		
+		if(intersection.touchesPathwayWithHarbor()) {
+			this.tradeDeals.add(intersection.getAdjacentHarbor());
+		}
 	}
 	
 	public void buildCity(Intersection intersection) {
@@ -116,11 +128,32 @@ public class Player {
 		return this.pieces;
 	}
 	
+	public boolean canExchangeSelectedCards() {
+		return this.hand.canExchangeSelectedCards(this.tradeDeals);
+	}
+	
+	public boolean exchangeSelectedCards(Resource r) {
+		if(this.hand.getSelectedType() != r) {
+			this.hand.exchangeSelectedCards(r);
+			return true;
+		}
+		return false;
+	}
+	
 	public static void rob(Player takeFrom, Player addTo) {
 		ResourceCard stolen = takeFrom.getHand().removeRandomCard();
 		if(stolen != null) {
 			addTo.getHand().addCardOfResourceType(stolen.getResource());
 		}
+	}
+	
+	public boolean hasInitialSettlementLeft() {
+		return this.freeSettlements > 0;
+	}
+	
+	public boolean isLastInitialSettlementLocation(Intersection intersection) {
+		System.out.println(lastInitialSettlement);
+		return intersection == lastInitialSettlement;
 	}
 	
 }

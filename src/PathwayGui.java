@@ -10,15 +10,24 @@ public class PathwayGui {
 	private Point start;
 	private Point end;
 	private Pathway pathway;
+	private HarborGui harborGui;
 	private boolean hover;
 	
 	public PathwayGui(Point start, Point end, Pathway pathway) {
 		this.start = start;
 		this.end = end;
 		this.pathway = pathway;
+		
+		if(pathway.hasHarbor()) {
+			this.harborGui =  new HarborGui(pathway.getHarbor());
+		}
 	}
 	
 	public void draw(Graphics2D g) {
+		if(this.harborGui != null) {
+			harborGui.draw(g, start, end);
+		}
+		
 		if(hover) {
 			g.setColor(Color.white);
 			g.setStroke(new BasicStroke((int) (BoardGui.BASE_SIZE * THICKNESS_RATIO)));

@@ -121,7 +121,16 @@ public class Hand {
 		sortCards();
 	}
 	
-	public boolean canExchangeSelectedCards() {
+	public Resource getSelectedType() {
+		for(ResourceCard card : cards) {
+			if(card.isSelected()) {
+				return card.getResource();
+			}
+		}
+		return null;
+	}
+	
+	public boolean canExchangeSelectedCards(ArrayList<HarborType> tradeDeals) {
 		int count = 0;
 		Resource r = null;
 		for(ResourceCard card : cards) {
@@ -135,8 +144,32 @@ public class Hand {
 			}
 		}
 		
-		// TODO: change return based on ports
-		return count == 4;
+		if(r == null) {
+			return false;
+		}
+		
+		if((r == Resource.Bricks && tradeDeals.contains(HarborType.TwoForOneBricks)) ||
+				(r == Resource.Ore && tradeDeals.contains(HarborType.TwoForOneOre)) ||
+				(r == Resource.Sheep && tradeDeals.contains(HarborType.TwoForOneSheep)) ||
+				(r == Resource.Wood && tradeDeals.contains(HarborType.TwoForOneWood)) ||
+				(r == Resource.Wheat && tradeDeals.contains(HarborType.TwoForOneWheat))) {
+			return count == 2;
+		} else if(tradeDeals.contains(HarborType.ThreeForOne)) {
+			return count == 3;
+		} else {
+			return count == 4;
+		}
+	}
+	
+	public void exchangeSelectedCards(Resource r) {
+		for(int i = 0; i < cards.size(); i++) {
+			if(cards.get(i).isSelected()) {
+				cards.remove(i);
+				i--;
+			}
+		}
+		cards.add(new ResourceCard(r));
+		sortCards();
 	}
 	
 	private void sortCards() {

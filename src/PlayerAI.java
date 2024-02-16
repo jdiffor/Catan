@@ -7,7 +7,6 @@ public class PlayerAI extends Player {
 
 	private boolean takenTurn = false;
 	private ArrayList<AIAction> thingsToDo;
-	private Intersection lastInitialSettlement;
 	
 	public PlayerAI(Color color, String name) {
 		super(color, name);
@@ -85,7 +84,7 @@ public class PlayerAI extends Player {
  				for(HexTile t : i.getHexTiles()) {
  					thisScore += Dice.combosForNumber(t.getNumber());
  	 			}
- 	 			if(thisScore > bestScore && i.validForSettlement(this, true)) {
+ 	 			if(thisScore > bestScore && i.validForSettlement(this)) {
  	 				bestScore = thisScore;
  	 				best = i;
  	 			}

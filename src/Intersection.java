@@ -65,15 +65,22 @@ public class Intersection {
 		this.structure = new City(player);
 	}
 	
-	public boolean validForSettlement(Player player, boolean initialSetup) {
+	public boolean validForSettlement(Player player) {
+		boolean initialSetup = player.hasInitialSettlementLeft();		
+		boolean touchesOwnedRoad = false;
 		for(int i = 0; i < pathways.length; i++) {
-			if(pathways[i] != null && pathways[i].hasIntersectionWithStructure()) {
-				return false;
+			if(pathways[i] != null) {
+				if(pathways[i].hasIntersectionWithStructure()) {
+					return false;
+				}
+				if(pathways[i].getRoad() != null && pathways[i].getRoad().getOwner() == player) {
+					touchesOwnedRoad = true;
+				}
 			}
 		}
 		
 		if(!initialSetup) {
-			// TODO: check for roads
+			return touchesOwnedRoad;
 		}
 		
 		return true;
@@ -85,6 +92,24 @@ public class Intersection {
 	
 	public boolean playerCanBuildRoadFrom(Player player) {
 		return (structure != null && structure.ownedBy(player)) || touchesOwnedRoad(player);
+	}
+	
+	public boolean touchesPathwayWithHarbor() {
+		for(int i = 0; i < pathways.length; i++) {
+			if(pathways[i] != null && pathways[i].hasHarbor()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public HarborType getAdjacentHarbor() {
+		for(int i = 0; i < pathways.length; i++) {
+			if(pathways[i] != null && pathways[i].hasHarbor()) {
+				return pathways[i].getHarbor().getType();
+			}
+		}
+		return null;
 	}
 	
 	private boolean touchesOwnedRoad(Player player) {

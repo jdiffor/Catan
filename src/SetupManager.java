@@ -56,7 +56,21 @@ public class SetupManager {
 			}
 		}
 		
+		setHarbors(board);
+		
 		return board;		
+	}
+	
+	private void setHarbors(HexTile[][] tiles) {
+		tiles[0][2].getTwelve().addHarbor(HarborType.ThreeForOne);
+		tiles[1][1].getTen().addHarbor(HarborType.TwoForOneOre);
+		tiles[1][3].getTwo().addHarbor(HarborType.TwoForOneSheep);
+		tiles[4][0].getTen().addHarbor(HarborType.TwoForOneWheat);
+		tiles[4][4].getTwo().addHarbor(HarborType.ThreeForOne);
+		tiles[6][0].getEight().addHarbor(HarborType.ThreeForOne);
+		tiles[6][4].getFour().addHarbor(HarborType.ThreeForOne);
+		tiles[7][1].getSix().addHarbor(HarborType.TwoForOneWood);
+		tiles[7][3].getSix().addHarbor(HarborType.TwoForOneBricks);
 	}
 	
 	private void addHexTilesToIntersections(HexTile tile) {

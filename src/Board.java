@@ -26,8 +26,8 @@ public class Board {
 		this.boardGui.draw(g);
 	}
 	
-	public boolean mouseMoved(Point p) {
-		return this.boardGui.mouseMoved(p);
+	public boolean mouseMoved(Point p, Player player) {
+		return this.boardGui.mouseMoved(p, player);
 	}
 	
 	public BoardClickEvent mouseClicked(Point p) {
@@ -70,6 +70,41 @@ public class Board {
 				t.distributeResources();
 			}
 		}
+	}
+	
+	public boolean canBuildSettlementSomewhere(Player player ) {
+		for(HexTile tile : boardTiles) {
+			for(Intersection intersection : tile.getIntersections()) {
+				if(intersection.validForSettlement(player)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean canBuildCitySomewhere(Player player ) {
+		for(HexTile tile : boardTiles) {
+			for(Intersection intersection : tile.getIntersections()) {
+				if(intersection.validForCity(player)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean canBuildRoadSomewhere(Player player ) {
+		for(HexTile tile : boardTiles) {
+			for(Intersection intersection : tile.getIntersections()) {
+				for(Pathway pathway : intersection.getPathways()) {
+					if(pathway.validForRoad(player)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	private HexTile findDesert() {

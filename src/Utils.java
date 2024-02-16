@@ -92,6 +92,18 @@ public class Utils {
 				(c1.getBlue() + c2.getBlue()) / 2);
 	}
 	
+	public static Point averagePoint(Point p1, Point p2) {
+		return new Point((int) (p1.getX() + p2.getX()) / 2, (int) (p1.getY() + p2.getY()) / 2);
+	}
+	
+	public static void fillCenteredOval(Graphics2D g, Point center, int width, int height) {
+		g.fillOval((int) center.getX() - width/2, (int) center.getY() - height/2, width, height);
+	}
+	
+	public static void fillCenteredRect(Graphics2D g, Point center, int width, int height) {
+		g.fillRect((int) center.getX() - width/2, (int) center.getY() - height/2, width, height);
+	}
+	
 	public static void wait(int millis) {
 		try {
 			Thread.sleep(millis);

@@ -12,6 +12,7 @@ public class Table {
 	private StateManager stateManager;
 	private TurnManager turnManager;
 	private ActionButtonContainer buttonContainer;
+	private CardExchangeGui cardExchange;
 	
 	public Table(int numPlayers) {
 		if(numPlayers < 2 || numPlayers > 4) {
@@ -29,6 +30,8 @@ public class Table {
 		
 		buttonContainer = new ActionButtonContainer();
 		buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
+		
+		cardExchange = new CardExchangeGui();
 	}
 	
 	public Board getBoard() {
@@ -36,7 +39,7 @@ public class Table {
 	}
 	
 	public boolean mouseMoved(Point p) {
-		return this.board.mouseMoved(p);
+		return this.board.mouseMoved(p, turnManager.getCurrentPlayer());
 	}
 	
 	
@@ -47,10 +50,19 @@ public class Table {
 		Pathway pathway = boardClick.getPathway();
 		HexTile tile = boardClick.getHexTile();
 		
+		// Clicking one of the main buttons from the left of screen
 		ActionButton button = this.buttonContainer.mouseClicked(p);
-		this.turnManager.getCurrentPlayer().mouseClicked(p, buttonContainer);
 		
+		// Selecting cards
+		if(stateManager.getActionState() == ActionState.YourTurn) {
+			this.turnManager.getCurrentPlayer().mouseClicked(p, buttonContainer);
+		}
+		
+		// Clicking on a player
 		Player playerToTradeWithOrStealFrom = this.party.mouseClicked(p);
+		
+		// Clicking accept or cancel on exchanging cards
+		Resource resourceFromExchange = this.cardExchange.mouseClicked(p);
 		
 		if(cancelling(button)) {
 			wrapUp();
@@ -109,6 +121,7 @@ public class Table {
 						turnManager.getCurrentPlayer().buildRoad(pathway);
 						buttonContainer.setButtonsForDoneWithInitialBuild();
 						stateManager.clearActionState();
+						board.clearHover();
 						return true;
 					}
 				}
@@ -128,17 +141,15 @@ public class Table {
 				return false;
 				
 			case Stealing:
-				System.out.println(playerToTradeWithOrStealFrom);
 				if(playerToTradeWithOrStealFrom != null) {
 					Player.rob(playerToTradeWithOrStealFrom, turnManager.getCurrentPlayer());
 					party.doneStealing();
-				}
-				wrapUp();
-				
+					wrapUp();
+				}				
 				return false;
 				
 			case BuildingRegularSettlement:
-				if(intersection != null && intersection.validForSettlement(turnManager.getCurrentPlayer(), false)) {
+				if(intersection != null && intersection.validForSettlement(turnManager.getCurrentPlayer())) {
 					if(turnManager.getCurrentPlayer().canBuildSettlement()) {
 						turnManager.getCurrentPlayer().buildSettlement(intersection);
 						wrapUp();
@@ -149,9 +160,10 @@ public class Table {
 				return false;
 				
 			case BuildingInitialSettlement:
-				if(intersection != null && intersection.validForSettlement(turnManager.getCurrentPlayer(), true)) {
+				if(intersection != null && intersection.validForSettlement(turnManager.getCurrentPlayer())) {
 					turnManager.getCurrentPlayer().buildSettlement(intersection);
 					//wrapUp();
+					board.clearHover();
 					buttonContainer.setButtonsForInitialRoad();
 					stateManager.clearActionState();
 					return true;
@@ -169,7 +181,11 @@ public class Table {
 				return false;
 				
 			case ExchangingCards:
-				
+				if(resourceFromExchange != null) {
+					if(turnManager.getCurrentPlayer().exchangeSelectedCards(resourceFromExchange)) {
+						wrapUp();
+					}
+				}
 				return true;
 			
 			default:
@@ -239,6 +255,7 @@ public class Table {
 				}
 				break;
 			case ExchangeCards:
+				this.stateManager.setActionState(ActionState.ExchangingCards);
 				this.buttonContainer.showCancelButton();
 				break;
 			case PlayDevCard:
@@ -251,7 +268,6 @@ public class Table {
 				buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
 				party.validateTradeButtons(null);
 				
-				
 				break;
 			default:
 				break;
@@ -259,7 +275,12 @@ public class Table {
 	}
 	
 	public void draw(Graphics2D g) {
-		this.board.draw(g);
+		if(this.stateManager.getActionState() == ActionState.ExchangingCards) {
+			this.cardExchange.draw(g);
+		} else {
+			this.board.draw(g);
+		}
+		
 		this.user.draw(g);
 		this.buttonContainer.draw(g);
 		this.dice.draw(g);
