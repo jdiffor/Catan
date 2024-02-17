@@ -8,15 +8,12 @@ public class DevelopmentCardStash {
 	private ArrayList<DevelopmentCard> playedCards;
 	private DevelopmentCardStashGui devCardStashGui;
 	
-	private static int largestArmySize = 2;
-	private static Player largestArmyOwner = null;
-	
 	public DevelopmentCardStash() {
 		unplayedCards = new ArrayList<DevelopmentCard>();
 		playedCards = new ArrayList<DevelopmentCard>();
 		devCardStashGui = new DevelopmentCardStashGui(this);
 		
-		unplayedCards.add(new DevelopmentCard(DevelopmentCardType.Monopoly));
+		unplayedCards.add(new DevelopmentCard(DevelopmentCardType.VictoryPoint));
 	}
 	
 	public void mouseClicked(Point p) {
@@ -84,12 +81,23 @@ public class DevelopmentCardStash {
 		return this.unplayedCards.isEmpty();
 	}
 	
-	public int getPoints(Player player) {
+	public int getPointsPrivate(Player player, SpecialPoints specialPoints) {
+		return getPoints(player, specialPoints, false);
+	}
+	
+	public int getPointsPublic(Player player, SpecialPoints specialPoints) {
+		return getPoints(player, specialPoints, true);
+	}
+	
+	private int getPoints(Player player, SpecialPoints specialPoints, boolean isPublic) {
 		int points = 0;
 		int playedKnightCount = 0;
-		for(DevelopmentCard card : unplayedCards) {
-			if(card.getType() == DevelopmentCardType.VictoryPoint) {
-				points++;
+		
+		if(!isPublic) {
+			for(DevelopmentCard card : unplayedCards) {
+				if(card.getType() == DevelopmentCardType.VictoryPoint) {
+					points++;
+				}
 			}
 		}
 		
@@ -99,12 +107,11 @@ public class DevelopmentCardStash {
 			}
 		}
 		
-		if(playedKnightCount > largestArmySize) {
-			largestArmySize = playedKnightCount;
-			largestArmyOwner = player;
+		if(playedKnightCount > specialPoints.getLargestArmySize()) {
+			specialPoints.setLargestArmy(playedKnightCount, player);
 		}
 		
-		if(largestArmyOwner == player) {
+		if(specialPoints.holdsLargestArmy(player)) {
 			points += 2;
 		}
 		

@@ -10,7 +10,8 @@ public class Player {
 	private DevelopmentCardStash devCards;
 	private PieceRepository pieces;
 	private String name;
-	protected int score;
+	protected int publicScore;
+	protected int privateScore;
 	protected int freeSettlements;
 	protected Intersection lastInitialSettlement;
 	protected ArrayList<HarborType> tradeDeals;
@@ -172,16 +173,30 @@ public class Player {
 		return intersection == lastInitialSettlement;
 	}
 	
-	public int calculateScore(Board board) {
-		int devCardPoints = this.devCards.getPoints(this);
-		int boardPoints = board.getPoints(this);
+	// Returns actual score to determine if player has won
+	public int updateScore(Board board, SpecialPoints specialPoints) {
+		int devCardPointsPublic = this.devCards.getPointsPublic(this, specialPoints);
+		int devCardPointsPrivate = this.devCards.getPointsPrivate(this, specialPoints);
+		int boardPoints = board.getPoints(this, specialPoints);
 		
-		this.score = devCardPoints + boardPoints;
-		return this.score;
+		this.publicScore = devCardPointsPublic + boardPoints;
+		this.privateScore = devCardPointsPrivate + boardPoints;
+		
+		return this.privateScore;
 	}
 	
-	public int getScore() {
-		return this.score;
+	// Returns known score to display
+	public int getKnownScore() {
+		return this.publicScore;
+	}
+	
+	// Returns actual score
+	public int getRealScore() {
+		return this.privateScore;
+	}
+	
+	public int getUnplayedDevelopmentCardsCount() {
+		return this.devCards.getUnplayedCards().size();
 	}
 	
 	public static void rob(Player takeFrom, Player addTo) {

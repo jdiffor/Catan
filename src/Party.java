@@ -7,6 +7,7 @@ public class Party {
 	private ArrayList<Player> players;
 	private Player user;
 	private PartyGui partyGui;
+	private SpecialPoints specialPoints;
 	
 	public Party(int numPlayers, SetupManager sm) {
 		this.players = new ArrayList<Player>();
@@ -18,7 +19,8 @@ public class Party {
 			players.add(new PlayerAI(sm.getNextColor(), "AI #" + i));
 		}
 		
-		this.partyGui = new PartyGui(this);		
+		this.partyGui = new PartyGui(this);	
+		this.specialPoints = new SpecialPoints(numPlayers);
 	}
 	
 	public Player mouseClicked(Point p) {
@@ -80,6 +82,10 @@ public class Party {
 		return nextPlayer;
 	}
 	
+	public SpecialPoints getSpecialPoints() {
+		return this.specialPoints;
+	}
+	
 	public void draw(Graphics2D g, Player currentPlayer) {
 		partyGui.draw(g, currentPlayer);
 	}
@@ -106,7 +112,7 @@ public class Party {
 	public boolean updateScores(Board board) {
 		int highScore = 0;
 		for(Player player : players) {
-			int score = player.calculateScore(board);			
+			int score = player.updateScore(board, specialPoints);			
 			
 			highScore = score > highScore ? score : score;
 		}

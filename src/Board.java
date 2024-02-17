@@ -9,11 +9,7 @@ public class Board {
 	private DevelopmentCardDeck devCardDeck;
 	
 	private BoardGui boardGui;
-	private StateManager stateManager;
-	
-	private static int longestRoadLength = 4;
-	private static Player longestRoadOwner = null;
-	
+	private StateManager stateManager;	
 	
 	public Board(SetupManager setupManager, StateManager stateManager) {
 		this.stateManager = stateManager;
@@ -110,7 +106,7 @@ public class Board {
 		return false;
 	}
 	
-	public int getPoints(Player player) {
+	public int getPoints(Player player, SpecialPoints specialPoints) {
 		ArrayList<Intersection> accountedFor = new ArrayList<Intersection>();
 		int points = 0;
 		
@@ -125,14 +121,13 @@ public class Board {
 				}
 				
 				int roadLength = longestRoadFrom(player, intersection, null);
-				if(roadLength > longestRoadLength) {
-					longestRoadLength = roadLength;
-					longestRoadOwner = player;
+				if(roadLength > specialPoints.getLongestRoadLength()) {
+					specialPoints.setLongestRoad(roadLength, player);
 				}
 			}
 		}
 		
-		if(player == longestRoadOwner) {
+		if(specialPoints.holdsLongesetRoad(player)) {
 			points += 2;
 		}
 		

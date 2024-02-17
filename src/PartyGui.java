@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 public class PartyGui {
 
+	private static final int HEIGHT = 70;
+	private static final int GAP = 10;
+	
 	private Party party;
 	private ArrayList<PlayerGui> playerGuis;
 	
@@ -12,7 +15,7 @@ public class PartyGui {
 		
 		playerGuis = new ArrayList<PlayerGui>();
 		for(int i = 0; i < party.size(); i++) {
-			playerGuis.add(new PlayerGui(party.get(i), i));
+			playerGuis.add(new PlayerGui(party.get(i), i, HEIGHT, GAP));
 		}
 		
 		disableAllTrades();
@@ -34,6 +37,8 @@ public class PartyGui {
 		for(int i = 0; i < playerGuis.size(); i++) {
 			playerGuis.get(i).draw(g, currentPlayer == party.getPlayers().get(i));
 		}
+		
+		party.getSpecialPoints().draw(g, HEIGHT, GAP);
 	}
 	
 	public void disableAllTrades() {

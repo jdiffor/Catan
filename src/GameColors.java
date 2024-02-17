@@ -30,5 +30,7 @@ public class GameColors {
 	public static Color MONOPOLY_COLOR = new Color(10, 78, 53);
 	public static Color YEAR_OF_PLENTY_COLOR = new Color(10, 78, 53);
 	
+	public static Color PLAYER_BACKGROUND_COLOR = new Color(232, 214, 142);
+	
 }
 

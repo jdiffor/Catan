@@ -374,6 +374,7 @@ public class Table {
 			} else {
 				wrapUp();
 			}
+			break;
 		case Monopoly:
 			this.buttonContainer.setAllInactive();
 			this.stateManager.setActionState(ActionState.Monopoly);

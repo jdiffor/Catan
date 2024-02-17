@@ -210,7 +210,7 @@ public class SetupManager {
 	public ArrayList<DevelopmentCard> createDevCardDeck() {
 		ArrayList<DevelopmentCard> devCards = new ArrayList<DevelopmentCard>();
 		addXDevCardsOfType(DevelopmentCardType.Knight, 14, devCards);
-		addXDevCardsOfType(DevelopmentCardType.RoadBuilding, 14, devCards);
+		addXDevCardsOfType(DevelopmentCardType.RoadBuilding, 2, devCards);
 		addXDevCardsOfType(DevelopmentCardType.YearOfPlenty, 2, devCards);
 		addXDevCardsOfType(DevelopmentCardType.Monopoly, 2, devCards);
 		addXDevCardsOfType(DevelopmentCardType.VictoryPoint, 5, devCards);

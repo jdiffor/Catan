@@ -6,26 +6,28 @@ import java.awt.Point;
 public class PlayerGui {
 	
 	private static final int WIDTH = 400;
-	private static final int HEIGHT = 70;
-	private static final int COLOR_BOX_WIDTH = HEIGHT;
-	private static final int GAP = 10;
+	private static final int COLOR_BOX_WIDTH_RATIO = 1;
 	private static final int HIGHLIGHT_BORDER_OUTER = 5;
 	private static final int HIGHLIGHT_BORDER_INNER = 3;
 	private static final Font NAME_FONT = new Font("Algerian", Font.BOLD, 16);
 	
 	private static final int TRADE_BUTTON_WIDTH = 80;
-	private static final int TRADE_BUTTON_HEIGHT = (int) (HEIGHT * 0.8);
+	private static final double TRADE_BUTTON_HEIGTH_RATIO = 0.8;
 	private static final int TRADE_BUTTON_RIGHT_BORDER = 5;
 
+	private int height;
+	private int gap;
 	private Player player;
 	private int playerNum;
 	private ActionButton tradeButton;
 	private ActionButton stealButton;
 	
-	public PlayerGui(Player player, int playerNum) {
+	public PlayerGui(Player player, int playerNum, int height, int gap) {
 		this.player = player;
-		this.tradeButton = new ActionButton("Trade", Action.Trade, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), TRADE_BUTTON_WIDTH, TRADE_BUTTON_HEIGHT);
-		this.stealButton = new ActionButton("Steal", Action.Steal, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), TRADE_BUTTON_WIDTH, TRADE_BUTTON_HEIGHT);
+		this.height = height;
+		this.gap = gap;
+		this.tradeButton = new ActionButton("Trade", Action.Trade, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) gap + (height+gap)*playerNum + height/2), TRADE_BUTTON_WIDTH, (int) (height * TRADE_BUTTON_HEIGTH_RATIO));
+		this.stealButton = new ActionButton("Steal", Action.Steal, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) gap + (height+gap)*playerNum + height/2), TRADE_BUTTON_WIDTH, (int) (height * TRADE_BUTTON_HEIGTH_RATIO));
 		this.playerNum = playerNum;
 	}
 	
@@ -38,30 +40,34 @@ public class PlayerGui {
 		// Highlighted if turn
 		if(myTurn) {
 			g.setColor(Color.black);
-			g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH) - HIGHLIGHT_BORDER_OUTER, GAP + (HEIGHT+GAP)*playerNum - HIGHLIGHT_BORDER_OUTER, WIDTH+HIGHLIGHT_BORDER_OUTER*2, HEIGHT+HIGHLIGHT_BORDER_OUTER*2);
+			g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH) - HIGHLIGHT_BORDER_OUTER, gap + (height+gap)*playerNum - HIGHLIGHT_BORDER_OUTER, WIDTH+HIGHLIGHT_BORDER_OUTER*2, height+HIGHLIGHT_BORDER_OUTER*2);
 			
 			g.setColor(Color.white);
-			g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH) - HIGHLIGHT_BORDER_INNER, GAP + (HEIGHT+GAP)*playerNum - HIGHLIGHT_BORDER_INNER, WIDTH+HIGHLIGHT_BORDER_INNER*2, HEIGHT+HIGHLIGHT_BORDER_INNER*2);	
+			g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH) - HIGHLIGHT_BORDER_INNER, gap + (height+gap)*playerNum - HIGHLIGHT_BORDER_INNER, WIDTH+HIGHLIGHT_BORDER_INNER*2, height+HIGHLIGHT_BORDER_INNER*2);	
 		} else {
 			g.setColor(Color.black);
-			g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH) - HIGHLIGHT_BORDER_INNER, GAP + (HEIGHT+GAP)*playerNum - HIGHLIGHT_BORDER_INNER, WIDTH+HIGHLIGHT_BORDER_INNER*2, HEIGHT+HIGHLIGHT_BORDER_INNER*2);
+			g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH) - HIGHLIGHT_BORDER_INNER, gap + (height+gap)*playerNum - HIGHLIGHT_BORDER_INNER, WIDTH+HIGHLIGHT_BORDER_INNER*2, height+HIGHLIGHT_BORDER_INNER*2);
 		}
 		
 		// Background
-		g.setColor(GameColors.SAND_OUTLINE_COLOR);
-		g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH), GAP + (HEIGHT+GAP)*playerNum, WIDTH, HEIGHT);
+		g.setColor(GameColors.PLAYER_BACKGROUND_COLOR);
+		g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH), gap + (height+gap)*playerNum, WIDTH, height);
 		
 		// Player color as banner		
 		g.setColor(player.getPieceColor());
-		g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH), GAP + (HEIGHT+GAP)*playerNum, COLOR_BOX_WIDTH, HEIGHT);
+		g.fillRect((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH), gap + (height+gap)*playerNum, (height * COLOR_BOX_WIDTH_RATIO), height);
 		
 		// Player name
 		g.setColor(Color.black);
-		Utils.drawCenteredHeightString(g, player.getName() + "  -  " + player.getHand().size() + " cards", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH + GAP), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
+		Utils.drawCenteredHeightString(g, player.getName() + "  -  " + player.getHand().size() + " cards", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + (height * COLOR_BOX_WIDTH_RATIO) + gap), gap + (height+gap)*playerNum + height/2), NAME_FONT);
 		
 		// Player score
-		int score = player.getScore();
-		Utils.drawCenteredString(g, score + "", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH/2), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
+		int knownScore = player.getKnownScore();
+		int possibleExtraPoints = player.getUnplayedDevelopmentCardsCount();
+		String knownScoreString = possibleExtraPoints > 0 ? knownScore + "+" + possibleExtraPoints + "?" : knownScore + "";
+		String realScoreString = player.getRealScore() + "";
+		
+		Utils.drawCenteredString(g, player instanceof PlayerAI ? knownScoreString : realScoreString, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + (height * COLOR_BOX_WIDTH_RATIO)/2), gap + (height+gap)*playerNum + height/2), NAME_FONT);
 		
 		// Player number of cards
 		//Utils.drawCenteredHeightString(g, player.getHand().size() + " cards", new Point((int) (GameWindow.WINDOW_DIM.getWidth() - WIDTH + COLOR_BOX_WIDTH + GAP), GAP + (HEIGHT+GAP)*playerNum + HEIGHT/2), NAME_FONT);
