@@ -55,7 +55,7 @@ public class Table {
 		
 		// Selecting cards
 		if(stateManager.getActionState() == ActionState.YourTurn) {
-			this.turnManager.getCurrentPlayer().mouseClicked(p, buttonContainer);
+			this.turnManager.getCurrentPlayer().mouseClicked(p, buttonContainer, turnManager);
 		}
 		
 		// Clicking on a player
@@ -107,7 +107,7 @@ public class Table {
 			case BuildingRoad:
 				if(pathway != null && pathway.validForRoad(turnManager.getCurrentPlayer())) {
 					if(turnManager.getCurrentPlayer().canBuildRoad()) {
-						turnManager.getCurrentPlayer().buildRoad(pathway);
+						turnManager.getCurrentPlayer().buildRoad(pathway, false);
 						wrapUp();
 					}
 				}
@@ -115,7 +115,7 @@ public class Table {
 			case BuildingInitialRoad:
 				if(pathway != null && pathway.validForRoad(turnManager.getCurrentPlayer())) {
 					if(turnManager.getCurrentPlayer().canBuildRoad()) {
-						turnManager.getCurrentPlayer().buildRoad(pathway);
+						turnManager.getCurrentPlayer().buildRoad(pathway, true);
 						buttonContainer.setButtonsForDoneWithInitialBuild();
 						stateManager.clearActionState();
 						board.clearHover();
@@ -129,6 +129,7 @@ public class Table {
 					if(countToRob > 0) {
 						buttonContainer.setAllInactive();
 						stateManager.setActionState(ActionState.Stealing);
+						board.clearHover();
 					} else {
 						wrapUp();
 					}
@@ -179,6 +180,43 @@ public class Table {
 				}
 				break;
 			
+			case YearOfPlentyCardOne:
+				if(resourceFromExchange != null) {
+					turnManager.getCurrentPlayer().addResource(resourceFromExchange);
+					stateManager.setActionState(ActionState.YearOfPlentyCardTwo);
+				}
+				break;
+				
+			case YearOfPlentyCardTwo:
+				if(resourceFromExchange != null) {
+					turnManager.getCurrentPlayer().addResource(resourceFromExchange);
+					wrapUp();
+				}
+				break;
+			case RoadBuildingFirstRoad:
+				if(pathway != null && pathway.validForRoad(turnManager.getCurrentPlayer()) && turnManager.getCurrentPlayer().canBuildFreeRoad()) {
+					turnManager.getCurrentPlayer().buildRoad(pathway, true);
+					if(turnManager.getCurrentPlayer().canBuildFreeRoad()) {
+						stateManager.setActionState(ActionState.RoadBuildingSecondRoad);
+					} else {
+						wrapUp();
+					}
+				}
+				break;
+				
+			case RoadBuildingSecondRoad:
+				if(pathway != null && pathway.validForRoad(turnManager.getCurrentPlayer()) && turnManager.getCurrentPlayer().canBuildFreeRoad()) {
+					turnManager.getCurrentPlayer().buildRoad(pathway, true);
+					wrapUp();
+				}
+				break;
+				
+			case Monopoly:
+				if(resourceFromExchange != null) {
+					this.party.activateMonopoly(turnManager.getCurrentPlayer(), resourceFromExchange);
+					wrapUp();
+				}
+				
 			default:
 				break;
 			}
@@ -250,9 +288,14 @@ public class Table {
 				this.buttonContainer.showCancelButton();
 				break;
 			case PlayDevCard:
-				this.buttonContainer.showCancelButton();
+				DevelopmentCardType playedCard = this.turnManager.getCurrentPlayer().playSelectedDevCard();
+				turnManager.playDevCard();
+				this.buttonContainer.setAllInactive();
+				takeDevCardAction(playedCard);
+				//play dev card
 				break;
 			case DoneWithTurn:
+				this.turnManager.getCurrentPlayer().unSelectDevCards();
 				this.stateManager.setActionState(ActionState.OponentsTurn);
 				this.turnManager.nextPlayersTurn();
 				
@@ -266,7 +309,10 @@ public class Table {
 	}
 	
 	public void draw(Graphics2D g) {
-		if(this.stateManager.getActionState() == ActionState.ExchangingCards) {
+		if(this.stateManager.getActionState() == ActionState.ExchangingCards ||
+				this.stateManager.getActionState() == ActionState.YearOfPlentyCardOne ||
+				this.stateManager.getActionState() == ActionState.YearOfPlentyCardTwo ||
+				this.stateManager.getActionState() == ActionState.Monopoly) {
 			this.cardExchange.draw(g);
 		} else {
 			this.board.draw(g);
@@ -311,6 +357,32 @@ public class Table {
 		}
 	}
 	
+	private void takeDevCardAction(DevelopmentCardType type) {
+		switch(type) {
+		case Knight:
+			this.buttonContainer.setAllInactive();
+			this.stateManager.setActionState(ActionState.MovingRobber);
+			break;
+		case YearOfPlenty:
+			this.buttonContainer.setAllInactive();
+			this.stateManager.setActionState(ActionState.YearOfPlentyCardOne);
+			break;
+		case RoadBuilding:
+			if(this.turnManager.getCurrentPlayer().canBuildFreeRoad()) {
+				this.buttonContainer.setAllInactive();
+				this.stateManager.setActionState(ActionState.RoadBuildingFirstRoad);
+			} else {
+				wrapUp();
+			}
+		case Monopoly:
+			this.buttonContainer.setAllInactive();
+			this.stateManager.setActionState(ActionState.Monopoly);
+			break;
+		default:
+			break;
+		}
+	}
+	
 	private boolean cancelling(ActionButton button) {
 		if(button != null && button.getAction() == Action.Cancel) {
 			return true;
@@ -323,6 +395,7 @@ public class Table {
 		board.clearHover();
 		stateManager.clearActionState();
 		turnManager.getCurrentPlayer().unSelectHand();
+		turnManager.getCurrentPlayer().unSelectDevCards();
 		buttonContainer.hideCancelButton();
 		buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
 	}

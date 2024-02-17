@@ -103,6 +103,8 @@ public class BoardGui {
 	 */
 	public boolean mouseMoved(Point p, Player player) {
 		switch(state.getActionState()) {
+			case RoadBuildingFirstRoad:
+			case RoadBuildingSecondRoad:
 			case BuildingInitialRoad:
 			case BuildingRoad:
 				return highlightHoveredPathway(p, player);
@@ -125,6 +127,8 @@ public class BoardGui {
 	 */
 	public BoardClickEvent mouseClicked(Point p) {
 		switch(state.getActionState()) {
+			case RoadBuildingFirstRoad:
+			case RoadBuildingSecondRoad:
 			case BuildingInitialRoad:
 			case BuildingRoad:
 				return new BoardClickEvent(clickPathway(p));

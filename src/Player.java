@@ -33,25 +33,41 @@ public class Player {
 		return this.pieceColor;
 	}
 	
-	public void mouseClicked(Point p, ActionButtonContainer buttons) {
+	public void mouseClicked(Point p, ActionButtonContainer buttons, TurnManager tm) {
 		this.hand.mouseClicked(p);
 		buttons.validateExchangeCardsButton(this);
+		
+		this.devCards.mouseClicked(p);
+		buttons.validatePlayDevelopmentCardButton(this, tm);
 	}
 	
 	public void draw(Graphics2D g) {
 		this.hand.draw(g);
+		this.devCards.draw(g);
 	}
 	
 	public void unSelectHand() {
 		this.hand.clearSelection();
 	}
 	
-	public boolean hasUnplayedDevCard() {
-		return devCards.hasUnplayedDevCard();
+	public void unSelectDevCards() {
+		this.devCards.clearSelection();
+	}
+	
+	public boolean hasPlayableDevCardSelected() {
+		return devCards.hasPlayableDevCardSelected();
+	}
+	
+	public DevelopmentCardType playSelectedDevCard() {
+		return this.devCards.playSelectedCard();
 	}
 	
 	public void addResource(Resource r) {
 		this.hand.addCardOfResourceType(r);
+	}
+	
+	public int removeAllCardsOfType(Resource r) {
+		return this.hand.removeAllCardsOfType(r);
 	}
 	
 	public boolean canBuildSettlement() {
@@ -62,6 +78,10 @@ public class Player {
 		return this.pieces.hasCity() && this.hand.canBuildCity();
 	}
 	
+	public boolean canBuildFreeRoad() {
+		return this.pieces.hasRoad();
+	}
+	
 	public boolean canBuildRoad() {
 		return this.pieces.hasRoad() && (hasInitialSettlementLeft() || this.hand.canBuildRoad());
 	}
@@ -70,10 +90,10 @@ public class Player {
 		return deck.hasCardsLeft() && this.hand.canBuildDevCard();
 	}
 	
-	public void buildRoad(Pathway pathway) {
+	public void buildRoad(Pathway pathway, boolean free) {
 		System.out.println("Building road");
 		
-		if(!hasInitialSettlementLeft()) {
+		if(!hasInitialSettlementLeft() && !free) {
 			this.hand.buildRoad();
 		}
 		this.pieces.useRoad();

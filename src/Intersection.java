@@ -86,6 +86,17 @@ public class Intersection {
 		return true;
 	}
 	
+	public boolean oneAwayFromStructure() {
+		for(int i = 0; i < pathways.length; i++) {
+			if(pathways[i] != null) {
+				if(pathways[i].hasIntersectionWithStructure()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public boolean validForCity(Player player) {
 		return structure != null && structure instanceof Settlement && structure.ownedBy(player);
 	}
@@ -112,7 +123,7 @@ public class Intersection {
 		return null;
 	}
 	
-	private boolean touchesOwnedRoad(Player player) {
+	public boolean touchesOwnedRoad(Player player) {
 		for(int i = 0; i < pathways.length; i++) {
 			if(pathways[i] != null && pathways[i].ownedBy(player)) {
 				return true;

@@ -70,6 +70,10 @@ public class Utils {
 		return list;
 	}
 	
+	public static Font fontOfSize(int size) {
+		return new Font("Algerian", Font.BOLD, size);
+	}
+	
 	public static void drawCenteredString(Graphics2D g, String text, Point p, Font font) {
 		FontMetrics metrics = g.getFontMetrics(font);
 		int x = (int) (p.getX() - metrics.stringWidth(text) / 2);

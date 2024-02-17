@@ -20,17 +20,14 @@ public class PlayerAI extends Player {
 		thingsToDo.add(AIAction.BuildInitialRoad);
 	}
 	
-	private void resetThingsToDo() {
+	private void resetGeneralThingsToDo() {
 		thingsToDo.clear();
-		thingsToDo.add(AIAction.RollDice);
-		
-		/*
+		thingsToDo.add(AIAction.RollDice);		
 		thingsToDo.add(AIAction.BuildCity);
 		thingsToDo.add(AIAction.BuildSettlement);
 		thingsToDo.add(AIAction.BuildRoad);
 		thingsToDo.add(AIAction.BuildDevCard);
 		thingsToDo.add(AIAction.TradeInCards);
-		*/
 	}
 	
 	/*
@@ -39,7 +36,7 @@ public class PlayerAI extends Player {
 	public boolean takeTurn(Board board, Dice dice) {		
 		// Do first thing
 		AIAction todo = thingsToDo.remove(0);
-		while(!takeAction(todo, board, dice)) {
+		while(!takeAction(todo, board, dice) && !thingsToDo.isEmpty()) {
 			todo = thingsToDo.remove(0);
 		}
 		
@@ -47,7 +44,7 @@ public class PlayerAI extends Player {
 			if(this.freeSettlements > 0) {
 				resetInitialSettlementThingsToDo();
 			} else {
-				resetThingsToDo();
+				resetGeneralThingsToDo();
 			}
 			return true;
 		}
@@ -59,21 +56,104 @@ public class PlayerAI extends Player {
 		
 		switch(todo) {
 		case BuildInitialSettlement:
-			buildInitialSettlement(board);
-			return true;
+			return buildSettlementAI(board);
 		case BuildInitialRoad:
-			buildInitialRoad(this.lastInitialSettlement);
+			buildInitialRoadAI(this.lastInitialSettlement);
 			return true;
 		case RollDice:
 			rollDiceAI(dice, board);
 			return true;
+		case BuildCity:
+			return buildCityAI(board);
+		case BuildSettlement:
+			return buildSettlementAI(board);
+		case BuildRoad:
+			return buildRoadAI(board);
 		}
 		
 		
 		return false;
 	}
 	
- 	private void buildInitialSettlement(Board board) {
+	private boolean buildRoadAI(Board board) {
+ 		if(board.canBuildRoadSomewhere(this) && this.canBuildRoad()) {
+ 			System.out.println(this.getName() + ": building road");
+ 			
+ 			Pathway best = null;
+ 			int bestScore = 0;
+ 			
+ 			ArrayList<Pathway> alreadyTested = new ArrayList<Pathway>();
+ 			
+ 			for(HexTile tile : board.getBoardTiles()) {
+ 				for(Intersection i : tile.getIntersections()) {
+ 					for(Pathway p : i.getPathways()) {
+ 						if(!alreadyTested.contains(p) && p.validForRoad(this)) {
+ 							int thisScore = 0;
+ 							if(p.getIntersectionNotTouchingPlayer(this) == null || p.getIntersectionNotTouchingPlayer(this).hasStructure()) {
+ 								thisScore = (int) (Math.random() * 2) + 1;
+ 							} else if(!p.getIntersectionNotTouchingPlayer(this).oneAwayFromStructure()) {
+ 								for(HexTile t : p.getIntersectionNotTouchingPlayer(this).getHexTiles()) {
+ 									thisScore += Dice.combosForNumber(t.getNumber());
+ 								}
+ 							} else {
+ 								thisScore = (int) (Math.random() * 4) + 1; //arbitrary
+ 							}
+ 							
+ 							if(thisScore > bestScore) {
+ 								bestScore = thisScore;
+ 								best = p;
+ 								System.out.println(p + " score: " + thisScore);
+ 							}
+ 						}
+ 					}
+ 				}
+ 			}
+ 			
+ 			if(best == null) {
+ 				return false;
+ 			}
+ 			
+ 			this.buildRoad(best, false);
+ 			return true;
+ 			
+ 		} else {
+ 			return false;
+ 		}
+ 	}
+	
+	private boolean buildCityAI(Board board) {
+		if(board.canBuildCitySomewhere(this) && this.canBuildCity()) {
+			System.out.println(this.getName() + ": building city");
+			Intersection best = null;
+			int bestScore = 0;
+			
+			for(HexTile tile : board.getBoardTiles()) {
+				for(Intersection i : tile.getIntersections()) {
+					
+					if(i.hasStructure() && i.getStructure() instanceof Settlement && i.getStructure().getOwner() == this) {
+						int thisScore = 0;
+						for(HexTile t : i.getHexTiles()) {
+							thisScore += Dice.combosForNumber(t.getNumber());
+						}
+						
+						if(thisScore > bestScore) {
+							bestScore = thisScore;
+							best = i;
+						}
+					}
+				}
+			}
+			this.buildCity(best);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+ 	private boolean buildSettlementAI(Board board) {
+ 		if(!this.canBuildSettlement()) {
+ 			return false;
+ 		}
  		
  		Intersection best = null;
  		int bestScore = 0;
@@ -92,11 +172,20 @@ public class PlayerAI extends Player {
  			}
  		}
  		
+ 		if(best == null) {
+ 			return false;
+ 		}
+ 		
+ 		System.out.println(this.getName() + ": building settlement");
+ 		
  		this.buildSettlement(best);
  		this.lastInitialSettlement = best;
+ 		
+ 		return true;
  	}
  	
- 	private void buildInitialRoad(Intersection intersection) {
+ 	private void buildInitialRoadAI(Intersection intersection) {
+ 		System.out.println(this.getName() + ": building road");
  		ArrayList<Pathway> pathways = intersection.getPathways();
  		
  		Pathway best = null;
@@ -114,7 +203,7 @@ public class PlayerAI extends Player {
 			}
  		}
  		
- 		this.buildRoad(best);
+ 		this.buildRoad(best, true);
  	}
 	
 	private void rollDiceAI(Dice dice, Board board) {

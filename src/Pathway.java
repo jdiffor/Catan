@@ -36,6 +36,10 @@ public class Pathway {
 	}
 	
 	public boolean validForRoad(Player player) {
+		if(this.hasRoad()) {
+			return false;
+		}
+		
 		for(int i = 0; i < intersections.length; i++) {
 			if(intersections[i] != null && intersections[i].playerCanBuildRoadFrom(player)) {
 				// If player is building an initial road, make sure it touches most recent settlement
@@ -58,6 +62,15 @@ public class Pathway {
 		return intersections[1] == i ? intersections[0] : intersections[1];
 	}
 	
+	public Intersection getIntersectionNotTouchingPlayer(Player p) {
+		for(int i = 0; i < intersections.length; i++) {
+			if(!intersections[i].touchesOwnedRoad(p)) {
+				return intersections[i];
+			}
+		}
+		return null;
+	}
+	
 	public boolean hasRoad() {
 		return this.road != null;
 	}
@@ -75,5 +88,19 @@ public class Pathway {
 			return false;
 		}
 		return this.road.ownedBy(player);
+	}
+	
+	public String toString() {
+		String s = "";
+		for(int i = 0; i < intersections.length; i++) {
+			s += "( ";
+			if(intersections[i] != null) {
+				for(HexTile tile : intersections[i].getHexTiles()) {
+					s += tile.getNumber() + " ";
+				}
+			}
+			s += ") ";
+		}
+		return s;
 	}
 }

@@ -22,7 +22,7 @@ public class HandGui {
 		
 		ArrayList<ResourceCard> cards = this.hand.getCards();
 		int allowedWidth = HAND_WIDTH / cards.size();
-		int width = allowedWidth > ResourceCardGui.WIDTH + DEFAULT_HAND_SEPARATION ? ResourceCardGui.WIDTH + DEFAULT_HAND_SEPARATION : allowedWidth;
+		int width = allowedWidth > CardGui.WIDTH + DEFAULT_HAND_SEPARATION ? CardGui.WIDTH + DEFAULT_HAND_SEPARATION : allowedWidth;
 		int cardNum = (int) ((p.getX() - CONTAINER_START_X) / width);
 		
 		if(cardNum >= 0 && cardNum < cards.size()) {
@@ -39,7 +39,7 @@ public class HandGui {
 		int allowedWidth = HAND_WIDTH / cards.size();
 		int x = CONTAINER_START_X;
 		
-		int width = allowedWidth > ResourceCardGui.WIDTH + DEFAULT_HAND_SEPARATION ? ResourceCardGui.WIDTH + DEFAULT_HAND_SEPARATION : allowedWidth;
+		int width = allowedWidth > CardGui.WIDTH + DEFAULT_HAND_SEPARATION ? CardGui.WIDTH + DEFAULT_HAND_SEPARATION : allowedWidth;
 		
 		for(int i = 0; i < cards.size(); i++) {
 			cards.get(i).draw(g, x, calculateTopOfCard());
@@ -68,7 +68,7 @@ public class HandGui {
 	}
 	
 	private int calculateTopOfCard() {
-		return GameWindow.WINDOW_DIM.height - DEFAULT_HAND_SEPARATION - ResourceCardGui.HEIGHT;
+		return GameWindow.WINDOW_DIM.height - DEFAULT_HAND_SEPARATION - CardGui.HEIGHT;
 	}
 	
 }

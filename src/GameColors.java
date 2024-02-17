@@ -24,5 +24,11 @@ public class GameColors {
 	
 	public static Color ROBBER_COLOR = new Color(108, 108, 108);
 	
+	public static Color KNIGHT_COLOR = new Color(149, 31, 5);
+	public static Color VICTORY_POINT_COLOR = new Color(253, 245, 155);
+	public static Color ROAD_BUILDING_COLOR = new Color(10, 78, 53);
+	public static Color MONOPOLY_COLOR = new Color(10, 78, 53);
+	public static Color YEAR_OF_PLENTY_COLOR = new Color(10, 78, 53);
 	
 }
+

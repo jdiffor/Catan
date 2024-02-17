@@ -3,6 +3,8 @@ import java.util.Comparator;
 
 public class TurnManager {
 
+	public static int TURN_NUMBER = 0;
+	
 	private Party party;
 	private Player currentPlayer;
 	private boolean devCardPlayed;
@@ -23,6 +25,7 @@ public class TurnManager {
 	}
 	
 	public Player nextPlayersTurn() {
+		TURN_NUMBER++;
 		
 		if(initialBuildingOrder.size() > 0) {
 			currentPlayer = initialBuildingOrder.remove(0);

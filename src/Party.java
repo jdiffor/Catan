@@ -89,6 +89,19 @@ public class Party {
 		System.out.println(offering.getName() + " offers " + beingOffered.getName() + " a trade");
 	}
 	
+	public void activateMonopoly(Player monopolizer, Resource resource) {
+		int cardsTaken = 0;
+		for(Player p : players) {
+			if(p != monopolizer) {
+				cardsTaken += p.removeAllCardsOfType(resource);
+			}
+		}
+		
+		for(int i = 0; i < cardsTaken; i++) {
+			monopolizer.addResource(resource);
+		}
+	}
+	
 	// Return true if game over, false otherwise
 	public boolean updateScores(Board board) {
 		int highScore = 0;

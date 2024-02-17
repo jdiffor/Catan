@@ -22,12 +22,12 @@ public class CardExchangeGui {
 		int centerX = GameWindow.WINDOW_DIM.width / 2;
 		int centerY = GameWindow.WINDOW_DIM.height / 2;
 		
-		int x = centerX - ResourceCardGui.WIDTH*3 + GAP*2;
-		int y = centerY - ResourceCardGui.HEIGHT/2;
+		int x = centerX - CardGui.WIDTH*3 + GAP*2;
+		int y = centerY - CardGui.HEIGHT/2;
 		
 		for(ResourceCard card : cards) {
 			card.draw(g, x, y);
-			x += (ResourceCardGui.WIDTH + GAP);
+			x += (CardGui.WIDTH + GAP);
 		}
 	}
 	
@@ -35,19 +35,19 @@ public class CardExchangeGui {
 		int centerX = GameWindow.WINDOW_DIM.width / 2;
 		int centerY = GameWindow.WINDOW_DIM.height / 2;
 		
-		int lowY = centerY - ResourceCardGui.HEIGHT/2;
-		int highY = lowY + ResourceCardGui.HEIGHT;
+		int lowY = centerY - CardGui.HEIGHT/2;
+		int highY = lowY + CardGui.HEIGHT;
 		
 		if(p.getY() < lowY || p.getY() > highY) {
 			return null;
 		}
 		
-		int x = centerX - ResourceCardGui.WIDTH*3 + GAP*2;
+		int x = centerX - CardGui.WIDTH*3 + GAP*2;
 		for(ResourceCard card : cards) {
-			if(p.getX() >= x && p.getX() <= x + ResourceCardGui.WIDTH) {
+			if(p.getX() >= x && p.getX() <= x + CardGui.WIDTH) {
 				return card.getResource();
 			}
-			x += (ResourceCardGui.WIDTH + GAP);
+			x += (CardGui.WIDTH + GAP);
 		}
 		
 		return null;

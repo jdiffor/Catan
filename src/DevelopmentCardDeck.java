@@ -9,7 +9,9 @@ public class DevelopmentCardDeck {
 	}
 	
 	public DevelopmentCard drawCard() {
-		return this.cards.remove(0);
+		DevelopmentCard card = cards.remove(0);
+		card.drawn();
+		return card;
 	}
 	
 	public boolean hasCardsLeft() {

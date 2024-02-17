@@ -12,6 +12,12 @@ public enum ActionState {
 	Stealing,
 	PreRoll,
 	YourTurn,
-	OponentsTurn
+	OponentsTurn,
+	
+	YearOfPlentyCardOne,
+	YearOfPlentyCardTwo,
+	Monopoly,
+	RoadBuildingFirstRoad,
+	RoadBuildingSecondRoad
 	
 }

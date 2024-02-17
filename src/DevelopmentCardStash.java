@@ -1,42 +1,100 @@
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.ArrayList;
 
 public class DevelopmentCardStash {
 
-	private ArrayList<DevelopmentCard> cards;
+	private ArrayList<DevelopmentCard> unplayedCards;
+	private ArrayList<DevelopmentCard> playedCards;
 	private DevelopmentCardStashGui devCardStashGui;
 	
 	private static int largestArmySize = 2;
 	private static Player largestArmyOwner = null;
 	
 	public DevelopmentCardStash() {
-		cards = new ArrayList<DevelopmentCard>();
+		unplayedCards = new ArrayList<DevelopmentCard>();
+		playedCards = new ArrayList<DevelopmentCard>();
 		devCardStashGui = new DevelopmentCardStashGui(this);
+		
+		unplayedCards.add(new DevelopmentCard(DevelopmentCardType.Monopoly));
 	}
 	
-	public ArrayList<DevelopmentCard> getCards() {
-		return this.cards;
+	public void mouseClicked(Point p) {
+		this.devCardStashGui.mouseClicked(p);
+	}
+	
+	public void draw(Graphics2D g) {
+		devCardStashGui.draw(g);
+	}
+	
+	public DevelopmentCardType playSelectedCard() {
+		for(DevelopmentCard card : unplayedCards) {
+			if(card.isSelected()) {
+				unplayedCards.remove(card);
+				playedCards.add(card);
+				card.play();
+				return card.getType();
+			}
+		}
+		return null;
+	}
+	
+	public ArrayList<DevelopmentCard> getUnplayedCards() {
+		return this.unplayedCards;
+	}
+	
+	public ArrayList<DevelopmentCard> getPlayedCards() {
+		return this.playedCards;
 	}
 	
 	public void addCard(DevelopmentCard card) {
-		this.cards.add(card);
+		this.unplayedCards.add(card);
 	}
 	
-	public boolean hasUnplayedDevCard() {
-		for(DevelopmentCard card : cards) {
-			if(!card.played()) {
+	public void clearSelection() {
+		for(DevelopmentCard card : unplayedCards) {
+			card.unSelect();
+		}
+	}
+	
+	public void selectCard(DevelopmentCard c) {
+		if(c == null) {
+			return;
+		}
+		
+		for(DevelopmentCard card : unplayedCards) {
+			if(card == c) {
+				card.toggleSelect();
+			} else {
+				card.unSelect();
+			}
+		}
+	}
+	
+	public boolean hasPlayableDevCardSelected() {
+		for(DevelopmentCard card : unplayedCards) {
+			if(card.getTurnAcquired() != TurnManager.TURN_NUMBER && !card.played() && card.isSelected() && card.getType() != DevelopmentCardType.VictoryPoint) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
+	public boolean isEmpty() {
+		return this.unplayedCards.isEmpty();
+	}
+	
 	public int getPoints(Player player) {
 		int points = 0;
 		int playedKnightCount = 0;
-		for(DevelopmentCard card : cards) {
+		for(DevelopmentCard card : unplayedCards) {
 			if(card.getType() == DevelopmentCardType.VictoryPoint) {
 				points++;
-			} else if(card.getType() == DevelopmentCardType.Knight && card.played()) {
+			}
+		}
+		
+		for(DevelopmentCard card : playedCards) {
+			if(card.getType() == DevelopmentCardType.Knight && card.played()) {
 				playedKnightCount++;
 			}
 		}

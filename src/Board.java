@@ -136,13 +136,12 @@ public class Board {
 			points += 2;
 		}
 		
-		System.out.println(longestRoadLength);
+		// System.out.println("Longest road length: " + longestRoadLength);
 		
 		return points;
 	}
 	
 	private int longestRoadFrom(Player player, Intersection intersection, ArrayList<Pathway> visited) {
-		System.out.println(visited == null);
 		if(visited == null) {
 			visited = new ArrayList<Pathway>();
 		}

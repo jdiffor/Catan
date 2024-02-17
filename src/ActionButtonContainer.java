@@ -77,7 +77,7 @@ public class ActionButtonContainer {
 			validateBuildSettlementButton(player, board);
 			validateBuildCityButton(player, board);
 			validateBuildDevCardButton(player, board.getDevCardDeck());
-			validatePlayDevelopmentCard(player, tm);
+			validatePlayDevelopmentCardButton(player, tm);
 			
 			doneWithTurnButton.setActive(true); // Always active unless we haven't rolled yet
 		}
@@ -88,6 +88,12 @@ public class ActionButtonContainer {
 	
 	public void validateExchangeCardsButton(Player player) {
 		this.exchangeCardsButton.setActive(player.canExchangeSelectedCards());
+	}
+	
+	public void validatePlayDevelopmentCardButton(Player player, TurnManager tm) {
+		boolean cardSelected = player.hasPlayableDevCardSelected();
+		boolean nonePlayedYet = !tm.hasDevCardBeenPlayedThisTurn();
+		this.playDevCardButton.setActive(cardSelected && nonePlayedYet);
 	}
 	
 	private void validateBuildRoadButton(Player player, Board board) {
@@ -107,7 +113,7 @@ public class ActionButtonContainer {
 	private void validateBuildCityButton(Player player, Board board) {
 		boolean hasCards = player.getHand().canBuildCity();
 		boolean hasPieces = player.getPieces().hasCity();
-		boolean hasLocation = board.canBuildSettlementSomewhere(player);
+		boolean hasLocation = board.canBuildCitySomewhere(player);
 		this.buildCityButton.setActive(hasCards && hasPieces && hasLocation);
 	}
 	
@@ -115,12 +121,6 @@ public class ActionButtonContainer {
 		boolean hasCards = player.getHand().canBuildDevCard();
 		boolean deckHasCardsLeft = deck.hasCardsLeft();
 		this.buildDevCardButton.setActive(hasCards && deckHasCardsLeft);
-	}
-	
-	private void validatePlayDevelopmentCard(Player player, TurnManager tm) {
-		boolean hasCards = player.hasUnplayedDevCard();
-		boolean nonePlayedYet = !tm.hasDevCardBeenPlayedThisTurn();
-		this.playDevCardButton.setActive(hasCards && nonePlayedYet);
 	}
 	
 	public void showCancelButton() {

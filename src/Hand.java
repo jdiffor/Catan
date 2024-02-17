@@ -34,6 +34,16 @@ public class Hand {
 		sortCards();
 	}
 	
+	public int removeAllCardsOfType(Resource r) {
+		int removed = 0;
+		ResourceCard removing = new ResourceCard(r);
+		while(cards.contains(removing)) {
+			cards.remove(removing);
+			removed++;
+		}
+		return removed;
+	}
+	
 	public ArrayList<ResourceCard> getCards() {
 		return this.cards;
 	}
