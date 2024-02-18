@@ -13,6 +13,7 @@ public class Table {
 	private TurnManager turnManager;
 	private ActionButtonContainer buttonContainer;
 	private CardExchangeGui cardExchange;
+	private TradeProposal tradeProposal;
 	
 	public Table(int numPlayers) {
 		if(numPlayers < 2 || numPlayers > 4) {
@@ -32,6 +33,7 @@ public class Table {
 		buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
 		
 		cardExchange = new CardExchangeGui();
+		tradeProposal = new TradeProposal();
 	}
 	
 	public Board getBoard() {
@@ -54,7 +56,7 @@ public class Table {
 		ActionButton button = this.buttonContainer.mouseClicked(p);
 		
 		// Selecting cards
-		if(stateManager.getActionState() == ActionState.YourTurn) {
+		if(stateManager.getActionState() == ActionState.YourTurn || stateManager.getActionState() == ActionState.ProposingTrade) {
 			this.turnManager.getCurrentPlayer().mouseClicked(p, buttonContainer, turnManager);
 		}
 		
@@ -64,6 +66,11 @@ public class Table {
 		// Clicking accept or cancel on exchanging cards
 		Resource resourceFromExchange = this.cardExchange.mouseClicked(p);
 		
+		// Clicking on a card while building a trade proposal
+		if(stateManager.getActionState() == ActionState.ProposingTrade) {
+			this.tradeProposal.mouseClicked(p);
+		}
+
 		if(cancelling(button)) {
 			wrapUp();
 			return;
@@ -100,7 +107,7 @@ public class Table {
 				
 				// Not stealing if YourTurn, must be trading
 				if(playerToTradeWithOrStealFrom != null) {
-					party.initiateTrade(turnManager.getCurrentPlayer(), playerToTradeWithOrStealFrom);
+					startTrade(playerToTradeWithOrStealFrom);
 				}
 				break;
 				
@@ -140,6 +147,7 @@ public class Table {
 				if(playerToTradeWithOrStealFrom != null) {
 					Player.rob(playerToTradeWithOrStealFrom, turnManager.getCurrentPlayer());
 					party.doneStealing();
+					party.validateTradeButtons(turnManager.getCurrentPlayer());
 					wrapUp();
 				}				
 				break;
@@ -177,6 +185,13 @@ public class Table {
 					if(turnManager.getCurrentPlayer().exchangeSelectedCards(resourceFromExchange)) {
 						wrapUp();
 					}
+				}
+				break;
+				
+			case ProposingTrade:
+				buttonContainer.validateOfferTradeButton(turnManager.getCurrentPlayer(), tradeProposal);
+				if(button != null && button.getAction() == Action.OfferTrade) {
+					handleButtonClick(button.getAction());
 				}
 				break;
 			
@@ -226,7 +241,7 @@ public class Table {
 	}
 	
 	private void handleButtonClick(Action action) {
-		if(action != Action.ExchangeCards) {
+		if(action != Action.ExchangeCards && action != Action.OfferTrade) {
 			turnManager.getCurrentPlayer().unSelectHand();
 		}
 		
@@ -235,7 +250,7 @@ public class Table {
 				// Currently this case is never reached because we return if cancelling from
 				// mouseClicked before calling handleButtonClick
 				this.stateManager.clearActionState();
-				this.buttonContainer.hideCancelButton();
+				this.buttonContainer.hideNonStandardButtons();
 				this.turnManager.getCurrentPlayer().unSelectHand();
 			case BuildCity:
 				this.stateManager.setActionState(ActionState.BuildingCity);
@@ -292,7 +307,6 @@ public class Table {
 				turnManager.playDevCard();
 				this.buttonContainer.setAllInactive();
 				takeDevCardAction(playedCard);
-				//play dev card
 				break;
 			case DoneWithTurn:
 				this.turnManager.getCurrentPlayer().unSelectDevCards();
@@ -303,6 +317,19 @@ public class Table {
 				party.validateTradeButtons(null);
 				
 				break;
+				
+			case OfferTrade:
+				if(tradeProposal.getPlayerOfferingTo() == turnManager.getCurrentPlayer()) {
+					party.initiateTradeWithAll(turnManager.getCurrentPlayer(), turnManager.getCurrentPlayer().getSelectedCards(), tradeProposal.getSelectedCards());
+					System.out.println("Trade offered to all");
+				} else {
+					party.offerTrade(turnManager.getCurrentPlayer(), turnManager.getCurrentPlayer().getSelectedCards(), tradeProposal.getPlayerOfferingTo(), tradeProposal.getSelectedCards());
+					System.out.println("Trade offered to " + tradeProposal.getPlayerOfferingTo());
+				}
+				wrapUp();
+			
+				break;
+				
 			default:
 				break;
 		}
@@ -314,6 +341,8 @@ public class Table {
 				this.stateManager.getActionState() == ActionState.YearOfPlentyCardTwo ||
 				this.stateManager.getActionState() == ActionState.Monopoly) {
 			this.cardExchange.draw(g);
+		} else if(this.stateManager.getActionState() == ActionState.ProposingTrade) {
+			this.tradeProposal.draw(g);
 		} else {
 			this.board.draw(g);
 		}
@@ -392,12 +421,21 @@ public class Table {
 		return false;
 	}
 	
+	private void startTrade(Player clicked) {
+		tradeProposal.clear();
+		tradeProposal.setPlayerOfferingTo(clicked);
+		stateManager.setActionState(ActionState.ProposingTrade);
+		buttonContainer.showTradeButton();
+		party.validateTradeButtons(null);
+	}
+	
 	private void wrapUp() {
 		board.clearHover();
 		stateManager.clearActionState();
 		turnManager.getCurrentPlayer().unSelectHand();
 		turnManager.getCurrentPlayer().unSelectDevCards();
-		buttonContainer.hideCancelButton();
+		buttonContainer.hideNonStandardButtons();
 		buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
+		party.validateTradeButtons(turnManager.getCurrentPlayer());
 	}
 }

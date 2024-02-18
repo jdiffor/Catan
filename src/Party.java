@@ -90,9 +90,37 @@ public class Party {
 		partyGui.draw(g, currentPlayer);
 	}
 	
-	public void initiateTrade(Player offering, Player beingOffered) {
-		// TODO: implement
-		System.out.println(offering.getName() + " offers " + beingOffered.getName() + " a trade");
+	public boolean offerTrade(Player offering, ArrayList<ResourceCard> offeredCards, Player receivingOffer, ArrayList<ResourceCard> desiredCards) {
+		if(!receivingOffer.canFulfillTrade(desiredCards)) {
+			System.out.println(receivingOffer.getName() + " doesn't have the cards for this trade.");
+			return false;
+		}
+		
+		if(receivingOffer instanceof PlayerAI) {
+			if(((PlayerAI) receivingOffer).considerTradeOffer(offeredCards, desiredCards)) {
+				System.out.println("Trade accepted!");
+				enactTrade(offering, offeredCards, receivingOffer, desiredCards);
+				return true;
+			} else {
+				System.out.println("Trade rejected by " + receivingOffer.getName());
+			}
+		} else {
+			// Player is real, handle some other way (pause game and have user accept or reject offer)
+			return false;
+		}
+		return false;
+	}
+	
+	public boolean initiateTradeWithAll(Player offering, ArrayList<ResourceCard> offeredCards, ArrayList<ResourceCard> desiredCards) {
+		for(Player p : players) {
+			if(p != offering) {
+				boolean tradeAccepted = offerTrade(offering, offeredCards, p, desiredCards);
+				if(tradeAccepted) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	public void activateMonopoly(Player monopolizer, Resource resource) {
@@ -118,6 +146,16 @@ public class Party {
 		}
 		
 		return highScore >= 10;
+	}
+	
+	private void enactTrade(Player offering, ArrayList<ResourceCard> offeredCards, Player receivingOffer, ArrayList<ResourceCard> desiredCards) {
+		for(ResourceCard card : offeredCards) {
+			receivingOffer.getHand().addCard(offering.getHand().removeCard(card));
+		}
+		
+		for(ResourceCard card : desiredCards) {
+			offering.getHand().addCard(receivingOffer.getHand().removeCard(card));
+		}
 	}
 	
 }

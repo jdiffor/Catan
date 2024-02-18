@@ -20,13 +20,15 @@ public class PlayerGui {
 	private Player player;
 	private int playerNum;
 	private ActionButton tradeButton;
+	private ActionButton tradeAllButton;
 	private ActionButton stealButton;
 	
 	public PlayerGui(Player player, int playerNum, int height, int gap) {
 		this.player = player;
 		this.height = height;
 		this.gap = gap;
-		this.tradeButton = new ActionButton("Trade", Action.Trade, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) gap + (height+gap)*playerNum + height/2), TRADE_BUTTON_WIDTH, (int) (height * TRADE_BUTTON_HEIGTH_RATIO));
+		this.tradeButton = new ActionButton("Trade", null, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) gap + (height+gap)*playerNum + height/2), TRADE_BUTTON_WIDTH, (int) (height * TRADE_BUTTON_HEIGTH_RATIO));
+		this.tradeAllButton = new ActionButton("Trade All", null, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) gap + (height+gap)*playerNum + height/2), TRADE_BUTTON_WIDTH, (int) (height * TRADE_BUTTON_HEIGTH_RATIO));
 		this.stealButton = new ActionButton("Steal", Action.Steal, new Point((int) (GameWindow.WINDOW_DIM.getWidth() - TRADE_BUTTON_WIDTH/2 - TRADE_BUTTON_RIGHT_BORDER), (int) gap + (height+gap)*playerNum + height/2), TRADE_BUTTON_WIDTH, (int) (height * TRADE_BUTTON_HEIGTH_RATIO));
 		this.playerNum = playerNum;
 	}
@@ -74,15 +76,20 @@ public class PlayerGui {
 		
 		// Buttons
 		this.tradeButton.draw(g);
+		this.tradeAllButton.draw(g);
 		this.stealButton.draw(g);
 	}
 	
 	public boolean buttonClicked(Point p) {
-		return this.tradeButtonClicked(p) || this.stealButtonClicked(p);
+		return this.tradeButtonClicked(p) || this.tradeAllButtonClicked(p) || this.stealButtonClicked(p);
 	}
 	
 	public boolean tradeButtonClicked(Point p) {
 		return this.tradeButton.clicked(p);
+	}
+	
+	public boolean tradeAllButtonClicked(Point p) {
+		return this.tradeAllButton.clicked(p);
 	}
 	
 	public boolean stealButtonClicked(Point p) {
@@ -92,6 +99,11 @@ public class PlayerGui {
 	public void setTradeButtonAllowed(boolean allowed) {
 		this.tradeButton.setActive(allowed);
 		this.tradeButton.setHidden(!allowed);
+	}
+	
+	public void setTradeAllButtonAllowed(boolean allowed) {
+		this.tradeAllButton.setActive(allowed);
+		this.tradeAllButton.setHidden(!allowed);
 	}
 	
 	public void setStealButtonAllowed(boolean allowed) {

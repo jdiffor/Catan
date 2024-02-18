@@ -44,6 +44,7 @@ public class PartyGui {
 	public void disableAllTrades() {
 		for(PlayerGui playerGui : playerGuis) {
 			playerGui.setTradeButtonAllowed(false);
+			playerGui.setTradeAllButtonAllowed(false);
 		}
 	}
 	
@@ -51,8 +52,10 @@ public class PartyGui {
 		for(PlayerGui playerGui : playerGuis) {
 			if(playerGui.getPlayer() == p) {
 				playerGui.setTradeButtonAllowed(false);
+				playerGui.setTradeAllButtonAllowed(true);
 			} else {
 				playerGui.setTradeButtonAllowed(true);
+				playerGui.setTradeAllButtonAllowed(false);
 			}
 		}
 	}
@@ -61,8 +64,10 @@ public class PartyGui {
 		for(PlayerGui playerGui : playerGuis) {
 			if(playerGui.getPlayer() == p) {
 				playerGui.setTradeButtonAllowed(true);
+				playerGui.setTradeAllButtonAllowed(false);
 			} else {
 				playerGui.setTradeButtonAllowed(false);
+				playerGui.setTradeAllButtonAllowed(false);
 			}
 		}
 	}

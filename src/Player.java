@@ -63,6 +63,10 @@ public class Player {
 		return this.devCards.playSelectedCard();
 	}
 	
+	public boolean canFulfillTrade(ArrayList<ResourceCard> desiredCards) {
+		return this.hand.canFulfillTrade(desiredCards);
+	}
+	
 	public void addResource(Resource r) {
 		this.hand.addCardOfResourceType(r);
 	}
@@ -154,6 +158,18 @@ public class Player {
 	
 	public boolean canExchangeSelectedCards() {
 		return this.hand.canExchangeSelectedCards(this.tradeDeals);
+	}
+	
+	public ArrayList<Resource> getSelectedCardTypes() {
+		return this.hand.getSelectedCardTypes();
+	}
+	
+	public ArrayList<ResourceCard> getSelectedCards() {
+		return this.hand.getSelectedCards();
+	}
+	
+	public boolean hasAnyCardsSelected() {
+		return this.hand.hasAnyCardsSelected();
 	}
 	
 	public boolean exchangeSelectedCards(Resource r) {

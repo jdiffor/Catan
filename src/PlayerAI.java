@@ -30,6 +30,12 @@ public class PlayerAI extends Player {
 		thingsToDo.add(AIAction.TradeInCards);
 	}
 	
+	public boolean considerTradeOffer(ArrayList<ResourceCard> offeredCards, ArrayList<ResourceCard> desiredCards) {
+		System.out.println("Offering " + offeredCards.size());
+		System.out.println("Wanting " + desiredCards.size());
+		return offeredCards.size() > desiredCards.size();
+	}
+	
 	/*
 	 * Return true if turn is done, false otherwise
 	 */

@@ -9,6 +9,7 @@ public enum ActionState {
 	BuildingInitialSettlement,
 	BuildingRegularSettlement,
 	ExchangingCards,
+	ProposingTrade,
 	Stealing,
 	PreRoll,
 	YourTurn,

@@ -19,11 +19,14 @@ public class ActionButtonContainer {
 	
 	private ArrayList<ActionButton> buttons = new ArrayList<ActionButton>();
 	private ActionButton cancelButton;
+	private ActionButton offerTradeButton;
 	
 	public ActionButtonContainer() {
 		buttons = createActionButtons();
 		cancelButton = createCancelButton();
 		buttons.add(cancelButton);
+		offerTradeButton = createOfferTradeButton();
+		buttons.add(offerTradeButton);
 	}
 	
 	public ActionButton mouseClicked(Point p) {
@@ -90,6 +93,20 @@ public class ActionButtonContainer {
 		this.exchangeCardsButton.setActive(player.canExchangeSelectedCards());
 	}
 	
+	public void validateOfferTradeButton(Player player, TradeProposal tp) {
+		// TODO: check for same cards in offer
+		ArrayList<Resource> offering = player.getSelectedCardTypes();
+		ArrayList<Resource> wanted = tp.getSelectedCardTypes();
+		for(Resource r : offering) {
+			if(wanted.contains(r)) {
+				this.offerTradeButton.setActive(false);
+				return;
+			}
+		}
+				
+		this.offerTradeButton.setActive(player.hasAnyCardsSelected() && tp.hasAnyCardsSelected());
+	}
+	
 	public void validatePlayDevelopmentCardButton(Player player, TurnManager tm) {
 		boolean cardSelected = player.hasPlayableDevCardSelected();
 		boolean nonePlayedYet = !tm.hasDevCardBeenPlayedThisTurn();
@@ -130,15 +147,30 @@ public class ActionButtonContainer {
 		cancelButton.setHidden(false);
 	}
 	
-	public void hideCancelButton() {
+	public void showTradeButton() {
+		for(ActionButton button : buttons) {
+			button.setHidden(true);
+		}
+		cancelButton.setHidden(false);
+		offerTradeButton.setHidden(false);
+	}
+	
+	public void hideNonStandardButtons() {
 		for(ActionButton button : buttons) {
 			button.setHidden(false);
 		}
 		cancelButton.setHidden(true);
+		offerTradeButton.setHidden(true);
 	}
 	
 	private ActionButton createCancelButton() {
 		ActionButton b = new ActionButton("Cancel", Action.Cancel, new Point(START_X, START_Y));
+		b.setHidden(true);
+		return b;
+	}
+	
+	private ActionButton createOfferTradeButton() {
+		ActionButton b = new ActionButton("Offer Trade", Action.OfferTrade, new Point(START_X + ActionButton.BUTTON_WIDTH + BUTTON_GAP, START_Y));
 		b.setHidden(true);
 		return b;
 	}

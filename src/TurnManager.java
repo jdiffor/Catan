@@ -92,7 +92,8 @@ public class TurnManager {
 			}
 		}
 
-		this.currentPlayer = party.getPlayers().get(rolls.indexOf(highest));
+		//this.currentPlayer = party.getPlayers().get(rolls.indexOf(highest));
+		this.currentPlayer = party.getUser();
 		System.out.println(currentPlayer.getName() + " goes first");
 		createInitialBuildingOrder();
 		

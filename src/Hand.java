@@ -44,6 +44,17 @@ public class Hand {
 		return removed;
 	}
 	
+	public ResourceCard removeCard(ResourceCard c) {
+		if(this.cards.remove(c)) {
+			return c;
+		}
+		return null;
+	}
+	
+	public void addCard(ResourceCard c) {
+		this.cards.add(c);
+	}
+	
 	public ArrayList<ResourceCard> getCards() {
 		return this.cards;
 	}
@@ -140,6 +151,35 @@ public class Hand {
 		return null;
 	}
 	
+	public ArrayList<Resource> getSelectedCardTypes() {
+		ArrayList<Resource> types = new ArrayList<Resource>();
+		for(ResourceCard card : cards) {
+			if(card.isSelected() && !types.contains(card.getResource())) {
+				types.add(card.getResource());
+			}
+		}
+		return types;
+	}
+	
+	public ArrayList<ResourceCard> getSelectedCards() {
+		ArrayList<ResourceCard> selectedCards = new ArrayList<ResourceCard>();
+		for(ResourceCard card : cards) {
+			if(card.isSelected()) {
+				selectedCards.add(card);
+			}
+		}
+		return selectedCards;
+	}
+	
+	public boolean hasAnyCardsSelected() {
+		for(ResourceCard card : cards) {
+			if(card.isSelected()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean canExchangeSelectedCards(ArrayList<HarborType> tradeDeals) {
 		int count = 0;
 		Resource r = null;
@@ -180,6 +220,16 @@ public class Hand {
 		}
 		cards.add(new ResourceCard(r));
 		sortCards();
+	}
+	
+	public boolean canFulfillTrade(ArrayList<ResourceCard> desiredCards) {
+		ArrayList<ResourceCard> handCardsCopy = new ArrayList<ResourceCard>(cards);
+		for(ResourceCard c : desiredCards) {
+			if(!handCardsCopy.remove(c)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private void sortCards() {
