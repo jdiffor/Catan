@@ -12,6 +12,8 @@ public class DevelopmentCardStash {
 		unplayedCards = new ArrayList<DevelopmentCard>();
 		playedCards = new ArrayList<DevelopmentCard>();
 		devCardStashGui = new DevelopmentCardStashGui(this);
+		
+		unplayedCards.add(new DevelopmentCard(DevelopmentCardType.Knight));
 	}
 	
 	public void mouseClicked(Point p) {

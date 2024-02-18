@@ -8,7 +8,7 @@ public class DevelopmentCardStashGui {
 	private static final int DEFAULT_CARD_SEPARATION = 20;
 	private static final int CONTAINER_START_X = GameWindow.WINDOW_DIM.width - DEFAULT_CARD_SEPARATION - STASH_WIDTH;
 	
-	private static final int PLAYED_AREA_X = GameWindow.WINDOW_DIM.width - CardGui.WIDTH*2 - DEFAULT_CARD_SEPARATION;
+	private static final int PLAYED_AREA_X = GameWindow.WINDOW_DIM.width - CardGui.WIDTH - DEFAULT_CARD_SEPARATION;
 	private static final int PLAYED_AREA_Y = GameWindow.WINDOW_DIM.height / 2 - CardGui.HEIGHT/2;
 	private static final int PLAYED_CARD_SEPARATION = 40;
 
@@ -35,20 +35,19 @@ public class DevelopmentCardStashGui {
 	}
 	
 	public void draw(Graphics2D g) {
-		if(this.stash.isEmpty()) {
-			return;
-		}
-				
-		ArrayList<DevelopmentCard> unplayedCards = this.stash.getUnplayedCards();
-		int allowedWidth = STASH_WIDTH / unplayedCards.size();
-		int x = CONTAINER_START_X;
-		
-		int width = allowedWidth > CardGui.WIDTH + DEFAULT_CARD_SEPARATION ? CardGui.WIDTH + DEFAULT_CARD_SEPARATION : allowedWidth;
-		
-		for(int i = 0; i < unplayedCards.size(); i++) {
-			if(!unplayedCards.get(i).played()) {
-				unplayedCards.get(i).draw(g, x, calculateTopOfCard());
-				x += width;
+
+		if(!this.stash.isEmpty()) {
+			ArrayList<DevelopmentCard> unplayedCards = this.stash.getUnplayedCards();
+			int allowedWidth = STASH_WIDTH / unplayedCards.size();
+			int x = CONTAINER_START_X;
+			
+			int width = allowedWidth > CardGui.WIDTH + DEFAULT_CARD_SEPARATION ? CardGui.WIDTH + DEFAULT_CARD_SEPARATION : allowedWidth;
+			
+			for(int i = 0; i < unplayedCards.size(); i++) {
+				if(!unplayedCards.get(i).played()) {
+					unplayedCards.get(i).draw(g, x, calculateTopOfCard());
+					x += width;
+				}
 			}
 		}
 		
