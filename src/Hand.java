@@ -11,9 +11,14 @@ public class Hand {
 		cards = new ArrayList<ResourceCard>();
 		this.handGui = new HandGui(this);
 		
-		for(int i = 0; i < 10; i++) {
-			cards.add(new ResourceCard(Resource.Wood));
-		}
+		cards.add(new ResourceCard(Resource.Ore));
+		cards.add(new ResourceCard(Resource.Ore));
+		cards.add(new ResourceCard(Resource.Wheat));
+		cards.add(new ResourceCard(Resource.Wheat));
+		cards.add(new ResourceCard(Resource.Wood));
+		cards.add(new ResourceCard(Resource.Wood));
+		cards.add(new ResourceCard(Resource.Wood));
+		cards.add(new ResourceCard(Resource.Wood));
 	}
 	
 	public boolean isEmpty() {
@@ -229,6 +234,16 @@ public class Hand {
 		removeSelectedCards();
 		cards.add(new ResourceCard(r));
 		sortCards();
+	}
+	
+	public void exchange(ArrayList<ResourceCard> removing, ArrayList<ResourceCard> adding) {
+		for(ResourceCard c : removing) {
+			this.cards.remove(c);
+		}
+		
+		for(ResourceCard c : adding) {
+			this.cards.add(c);
+		}
 	}
 	
 	public void removeSelectedCards() {

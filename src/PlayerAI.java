@@ -22,12 +22,17 @@ public class PlayerAI extends Player {
 	
 	private void resetGeneralThingsToDo() {
 		thingsToDo.clear();
-		thingsToDo.add(AIAction.RollDice);		
+		thingsToDo.add(AIAction.RollDice);
+		thingsToDo.add(AIAction.TradeInCards);
 		thingsToDo.add(AIAction.BuildCity);
 		thingsToDo.add(AIAction.BuildSettlement);
 		thingsToDo.add(AIAction.BuildRoad);
 		thingsToDo.add(AIAction.BuildDevCard);
 		thingsToDo.add(AIAction.TradeInCards);
+		thingsToDo.add(AIAction.BuildCity);
+		thingsToDo.add(AIAction.BuildSettlement);
+		thingsToDo.add(AIAction.BuildRoad);
+		thingsToDo.add(AIAction.BuildDevCard);
 	}
 	
 	public boolean considerTradeOffer(ArrayList<ResourceCard> offeredCards, ArrayList<ResourceCard> desiredCards) {
@@ -84,11 +89,18 @@ public class PlayerAI extends Player {
 			return buildSettlementAI(board);
 		case BuildRoad:
 			return buildRoadAI(board);
+		case BuildDevCard:
+			return buildDevCardAI(board);
 		case MoveRobber:
 			moveRobberAI(board);
 			return true;
+		case TradeInCards:
+			return tradeInCardsAI();
+		case TradeWithPlayer:
+			return false;
+		case PlayDevCard:
+			return false;
 		}
-		
 		
 		return false;
 	}
@@ -166,6 +178,164 @@ public class PlayerAI extends Player {
 		} else {
 			return false;
 		}
+	}
+	
+	private boolean buildDevCardAI(Board board) {
+		if(this.canBuildDevCard(board.getDevCardDeck())) {
+			this.buildDevelopmentCard(board.getDevCardDeck());
+		}
+		return false;
+	}
+	
+	private boolean tradeInCardsAI() {
+		ArrayList<ResourceCard> handCopy = new ArrayList<ResourceCard>(this.getHand().getCards());
+		ArrayList<ResourceCard> city = new ArrayList<ResourceCard>();
+		
+		ArrayList<ResourceCard> needed = needsForCity(handCopy);
+		if(needed.size() == 0) {
+			return false;
+		} else {
+			ArrayList<ResourceCard> cardsToExchange = canExchangeForAmount(needed.size(), handCopy);
+			if(cardsToExchange != null) {
+				this.getHand().exchange(cardsToExchange, needed);
+				return true;
+			}
+		}
+		
+		handCopy = new ArrayList<ResourceCard>(this.getHand().getCards());
+		needed = needsForSettlement(handCopy);
+		if(needed.size() == 0) {
+			return false;
+		} else {
+			ArrayList<ResourceCard> cardsToExchange = canExchangeForAmount(needed.size(), handCopy);
+			if(cardsToExchange != null) {
+				this.getHand().exchange(cardsToExchange, needed);
+				return true;
+			}
+		}
+		
+		handCopy = new ArrayList<ResourceCard>(this.getHand().getCards());
+		needed = needsForRoad(handCopy);
+		if(needed.size() == 0) {
+			return false;
+		} else {
+			ArrayList<ResourceCard> cardsToExchange = canExchangeForAmount(needed.size(), handCopy);
+			if(cardsToExchange != null) {
+				this.getHand().exchange(cardsToExchange, needed);
+				return true;
+			}
+		}
+		
+		handCopy = new ArrayList<ResourceCard>(this.getHand().getCards());
+		needed = needsForDevCard(handCopy);
+		if(needed.size() == 0) {
+			return false;
+		} else {
+			ArrayList<ResourceCard> cardsToExchange = canExchangeForAmount(needed.size(), handCopy);
+			if(cardsToExchange != null) {
+				this.getHand().exchange(cardsToExchange, needed);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private ArrayList<ResourceCard> canExchangeForAmount(int numNeeded, ArrayList<ResourceCard> handCopy) {
+		int baseTrade = tradeDeals.contains(HarborType.ThreeForOne) ? 3 : 4;
+		HashMap<Resource, Integer> counts = new HashMap<Resource, Integer>();
+		for(ResourceCard c : handCopy) {
+			counts.put(c.getResource(), counts.getOrDefault(c.getResource(), 0) + 1);
+		}
+		
+		ArrayList<ResourceCard> exchanging = new ArrayList<ResourceCard>();
+		for(Resource r : counts.keySet()) {
+			int tradeAmount = this.tradeDeals.contains(Harbor.resourceToHarbor.get(r)) ? 2 : baseTrade;
+			int numAvailable = counts.get(r);
+			
+			// While we have more available to exchange
+			while(numAvailable > tradeAmount) {
+				
+				// Keep track of what we would exchange and how close we are to our goal
+				numAvailable -= tradeAmount;
+				numNeeded--;
+				
+				for(int i = 0; i < tradeAmount; i++) {
+					exchanging.add(new ResourceCard(r));
+				}
+				
+				if(numNeeded == 0) {
+					return exchanging;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private ArrayList<ResourceCard> needsForCity(ArrayList<ResourceCard> handCopy) {
+		ArrayList<ResourceCard> needed = new ArrayList<ResourceCard>();
+		
+		if(!handCopy.remove(new ResourceCard(Resource.Ore))) {
+			needed.add(new ResourceCard(Resource.Ore));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Ore))) {
+			needed.add(new ResourceCard(Resource.Ore));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Ore))) {
+			needed.add(new ResourceCard(Resource.Ore));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Wheat))) {
+			needed.add(new ResourceCard(Resource.Wheat));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Wheat))) {
+			needed.add(new ResourceCard(Resource.Wheat));
+		}
+		return needed;
+	}
+	
+	private ArrayList<ResourceCard> needsForSettlement(ArrayList<ResourceCard> handCopy) {
+		ArrayList<ResourceCard> needed = new ArrayList<ResourceCard>();
+		
+		if(!handCopy.remove(new ResourceCard(Resource.Sheep))) {
+			needed.add(new ResourceCard(Resource.Sheep));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Wood))) {
+			needed.add(new ResourceCard(Resource.Wood));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Bricks))) {
+			needed.add(new ResourceCard(Resource.Bricks));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Wheat))) {
+			needed.add(new ResourceCard(Resource.Wheat));
+		}
+		return needed;
+	}
+	
+	private ArrayList<ResourceCard> needsForRoad(ArrayList<ResourceCard> handCopy) {
+		ArrayList<ResourceCard> needed = new ArrayList<ResourceCard>();
+		
+		if(!handCopy.remove(new ResourceCard(Resource.Wood))) {
+			needed.add(new ResourceCard(Resource.Wood));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Bricks))) {
+			needed.add(new ResourceCard(Resource.Bricks));
+		}
+		return needed;
+	}
+	
+	private ArrayList<ResourceCard> needsForDevCard(ArrayList<ResourceCard> handCopy) {
+		ArrayList<ResourceCard> needed = new ArrayList<ResourceCard>();
+		
+		if(!handCopy.remove(new ResourceCard(Resource.Ore))) {
+			needed.add(new ResourceCard(Resource.Ore));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Wheat))) {
+			needed.add(new ResourceCard(Resource.Wheat));
+		}
+		if(!handCopy.remove(new ResourceCard(Resource.Sheep))) {
+			needed.add(new ResourceCard(Resource.Sheep));
+		}
+		return needed;
 	}
 	
  	private boolean buildSettlementAI(Board board) {

@@ -6,6 +6,7 @@ public enum AIAction {
 	BuildSettlement,
 	BuildRoad,
 	BuildDevCard,
+	PlayDevCard,
 	TradeInCards,
 	TradeWithPlayer,
 	
