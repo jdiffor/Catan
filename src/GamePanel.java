@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -14,10 +16,11 @@ public class GamePanel extends JPanel implements Runnable {
 	private static final int AI_DELAY_TIME_IN_MILLIS = 1000;
 	
 	private Table table;
+	private Menu menu;
 	
-	public GamePanel(Table table) {
+	public GamePanel() {
+		this.menu = new Menu();
 		
-		this.table = table;
 		
 		// JPanel properties
 		this.setPreferredSize(GameWindow.WINDOW_DIM);
@@ -27,17 +30,52 @@ public class GamePanel extends JPanel implements Runnable {
 		
 		this.addMouseMotionListener(new MouseAdapter() {
 			public void mouseMoved(MouseEvent e) {
-				table.mouseMoved(e.getPoint());
+				if(menu.isActive()) {
+					
+				} else {
+					table.mouseMoved(e.getPoint());
+				}
+				
 			}
 			
 			public void mouseDragged(MouseEvent e) {
-				table.mouseMoved(e.getPoint());
+				if(menu.isActive()) {
+					
+				} else {
+					table.mouseMoved(e.getPoint());
+				}
 			}
 		});
 		
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
-				table.mouseClicked(e.getPoint());
+				if(menu.isActive()) {
+					int val = menu.mouseClicked(e.getPoint());
+					
+					if(val == -1) {
+						System.exit(0);
+					} else if(val == 1) {
+						menu.show();
+						table = null;
+					} else if(val == 3) {
+						table = new Table(3);
+						menu.hide();
+					} else if(val == 4) {
+						table = new Table(4);
+						menu.hide();
+					}
+				} else {
+					table.mouseClicked(e.getPoint());
+				}
+				
+			}
+		});
+		
+		this.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					menu.toggleMidGame();
+				}
 			}
 		});
 	}
@@ -47,7 +85,13 @@ public class GamePanel extends JPanel implements Runnable {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		this.table.draw(g2);
+		if(this.table != null) {
+			this.table.draw(g2);
+		}
+		
+		if(menu.isActive()) {
+			menu.draw(g2);
+		}
 	}
 
 	@Override
@@ -56,7 +100,13 @@ public class GamePanel extends JPanel implements Runnable {
 		long prevTime = Utils.time();
 		while(true) {
 			if(Utils.time() - prevTime >= AI_DELAY_TIME_IN_MILLIS) {
-				table.takeAITurnIfApplicable();
+				if(!menu.isActive() && table != null) {
+					table.takeAITurnIfApplicable();
+					if(table.updateScores()) {
+						menu.show();
+					}
+				}
+				
 				prevTime = Utils.time();
 			}
 			

@@ -9,7 +9,7 @@ public class GameWindow extends JFrame {
 	
 	private GamePanel gamePanel;
 	
-	public GameWindow(String gameTitle, Table table) {
+	public GameWindow(String gameTitle) {
 		super();
 		
 		// Frame properties
@@ -20,7 +20,7 @@ public class GameWindow extends JFrame {
 		this.setUndecorated(true);
 	    this.setLocationRelativeTo(null);
 	    
-	    gamePanel = new GamePanel(table);
+	    gamePanel = new GamePanel();
 	    this.setContentPane(gamePanel);
 	    
 	    this.setVisible(true);

@@ -151,7 +151,7 @@ public class Party {
 		for(Player player : players) {
 			int score = player.updateScore(board, specialPoints);			
 			
-			highScore = score > highScore ? score : score;
+			highScore = score > highScore ? score : highScore;
 		}
 		
 		return highScore >= 10;

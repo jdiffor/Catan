@@ -244,8 +244,6 @@ public class Table {
 				break;
 			}
 		}
-		
-		party.updateScores(board);
 	}
 	
 	private void handleButtonClick(Action action) {
@@ -389,8 +387,6 @@ public class Table {
 					party.validateTradeButtons(null);
 				}
 			}
-			
-			party.updateScores(board);
 		} else if(turnManager.getCurrentPlayer() != user && stateManager.getActionState() == ActionState.Discarding) {
 			party.discardIfNeeded();
 			if(!user.hasTooManyCards()) {
@@ -399,6 +395,10 @@ public class Table {
 				buttonContainer.showDiscardButton();
 			}
 		}
+	}
+	
+	public boolean updateScores() {
+		return party.updateScores(board);
 	}
 	
 	private void rollDice() {
