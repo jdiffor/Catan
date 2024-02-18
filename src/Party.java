@@ -100,6 +100,7 @@ public class Party {
 			if(((PlayerAI) receivingOffer).considerTradeOffer(offeredCards, desiredCards)) {
 				System.out.println("Trade accepted!");
 				enactTrade(offering, offeredCards, receivingOffer, desiredCards);
+				offering.getHand().sortCards();
 				return true;
 			} else {
 				System.out.println("Trade rejected by " + receivingOffer.getName());

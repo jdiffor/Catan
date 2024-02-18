@@ -10,15 +10,6 @@ public class Hand {
 	public Hand() {
 		cards = new ArrayList<ResourceCard>();
 		this.handGui = new HandGui(this);
-		
-		cards.add(new ResourceCard(Resource.Ore));
-		cards.add(new ResourceCard(Resource.Ore));
-		cards.add(new ResourceCard(Resource.Wheat));
-		cards.add(new ResourceCard(Resource.Wheat));
-		cards.add(new ResourceCard(Resource.Wood));
-		cards.add(new ResourceCard(Resource.Wood));
-		cards.add(new ResourceCard(Resource.Wood));
-		cards.add(new ResourceCard(Resource.Wood));
 	}
 	
 	public boolean isEmpty() {
@@ -265,7 +256,7 @@ public class Hand {
 		return true;
 	}
 	
-	private void sortCards() {
+	public void sortCards() {
 		this.cards.sort((o1, o2) -> o1.getResource().toString().compareTo(o2.getResource().toString()));
 	}
 	

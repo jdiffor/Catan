@@ -29,17 +29,14 @@ public class GamePanel extends JPanel implements Runnable {
 			public void mouseMoved(MouseEvent e) {
 				table.mouseMoved(e.getPoint());
 			}
+			
+			public void mouseDragged(MouseEvent e) {
+				table.mouseMoved(e.getPoint());
+			}
 		});
 		
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
-				/*
-				boolean shouldRepaint = table.mouseClicked(e.getPoint());
-				if(shouldRepaint) {
-					System.out.println("repaint?");
-					repaint();
-				}
-				*/
 				table.mouseClicked(e.getPoint());
 			}
 		});

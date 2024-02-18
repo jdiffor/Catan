@@ -329,10 +329,8 @@ public class Table {
 			case OfferTrade:
 				if(tradeProposal.getPlayerOfferingTo() == turnManager.getCurrentPlayer()) {
 					party.initiateTradeWithAll(turnManager.getCurrentPlayer(), turnManager.getCurrentPlayer().getSelectedCards(), tradeProposal.getSelectedCards());
-					System.out.println("Trade offered to all");
 				} else {
 					party.offerTrade(turnManager.getCurrentPlayer(), turnManager.getCurrentPlayer().getSelectedCards(), tradeProposal.getPlayerOfferingTo(), tradeProposal.getSelectedCards());
-					System.out.println("Trade offered to " + tradeProposal.getPlayerOfferingTo());
 				}
 				wrapUp();
 			
@@ -410,7 +408,6 @@ public class Table {
 			if(turnManager.getCurrentPlayer().hasTooManyCards()) {
 				this.stateManager.setActionState(ActionState.Discarding);
 				this.buttonContainer.showDiscardButton();
-				System.out.println("we should be discarding");
 			} else {
 				this.stateManager.setActionState(ActionState.MovingRobber);
 				this.buttonContainer.setAllInactive();

@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 public class PlayerAI extends Player {
 
-	private boolean takenTurn = false;
 	private ArrayList<AIAction> thingsToDo;
 	
 	public PlayerAI(Color color, String name) {
@@ -181,7 +180,7 @@ public class PlayerAI extends Player {
 	}
 	
 	private boolean buildDevCardAI(Board board) {
-		if(this.canBuildDevCard(board.getDevCardDeck())) {
+		if(this.unplayedDevCardCount() < 3 && this.canBuildDevCard(board.getDevCardDeck())) {
 			this.buildDevelopmentCard(board.getDevCardDeck());
 		}
 		return false;

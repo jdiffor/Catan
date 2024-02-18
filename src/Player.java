@@ -148,9 +148,12 @@ public class Player {
 		return this.hand;
 	}
 	
-	
 	public DevelopmentCardStash getDevCardStash() {
 		return this.devCards;
+	}
+	
+	public int unplayedDevCardCount() {
+		return this.devCards.getUnplayedCards().size();
 	}
 	
 	public PieceRepository getPieces() {
