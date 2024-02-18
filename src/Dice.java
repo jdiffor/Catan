@@ -26,6 +26,9 @@ public class Dice {
 		d1 = (int) (Math.random() *6) + 1;
 		d2 = (int) (Math.random() *6) + 1; 
 		
+		d1 = (int) (Math.random() *2) + 3; ;
+		d2 = (int) (Math.random() *2) + 3; ;
+		
 		return d1 + d2;
 	}
 	

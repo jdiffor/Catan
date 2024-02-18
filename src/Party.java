@@ -136,6 +136,14 @@ public class Party {
 		}
 	}
 	
+	public void discardIfNeeded() {
+		for(Player p : players) {
+			if(p instanceof PlayerAI) {
+				((PlayerAI) p).discardCardsAI();
+			}
+		}
+	}
+	
 	// Return true if game over, false otherwise
 	public boolean updateScores(Board board) {
 		int highScore = 0;

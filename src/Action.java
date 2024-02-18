@@ -9,6 +9,7 @@ public enum Action {
 	RollDice,
 	OfferTrade,
 	Steal,
+	Discard,
 	DoneWithTurn,
 	Cancel
 }

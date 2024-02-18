@@ -11,9 +11,10 @@ public enum ActionState {
 	ExchangingCards,
 	ProposingTrade,
 	Stealing,
+	Discarding,
 	PreRoll,
 	YourTurn,
-	OponentsTurn,
+	OpponentsTurn,
 	
 	YearOfPlentyCardOne,
 	YearOfPlentyCardTwo,

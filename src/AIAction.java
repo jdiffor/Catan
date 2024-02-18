@@ -12,4 +12,6 @@ public enum AIAction {
 	BuildInitialSettlement,
 	BuildInitialRoad,
 	
+	MoveRobber
+	
 }

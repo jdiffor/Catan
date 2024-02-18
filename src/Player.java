@@ -148,12 +148,17 @@ public class Player {
 		return this.hand;
 	}
 	
+	
 	public DevelopmentCardStash getDevCardStash() {
 		return this.devCards;
 	}
 	
 	public PieceRepository getPieces() {
 		return this.pieces;
+	}
+	
+	public boolean hasTooManyCards() {
+		return this.hand.size() > 7;
 	}
 	
 	public boolean canExchangeSelectedCards() {
@@ -178,6 +183,10 @@ public class Player {
 			return true;
 		}
 		return false;
+	}
+	
+	public void discardSelectedCards() {
+		this.hand.removeSelectedCards();
 	}
 	
 	public boolean hasInitialSettlementLeft() {

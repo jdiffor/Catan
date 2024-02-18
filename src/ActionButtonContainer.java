@@ -20,6 +20,7 @@ public class ActionButtonContainer {
 	private ArrayList<ActionButton> buttons = new ArrayList<ActionButton>();
 	private ActionButton cancelButton;
 	private ActionButton offerTradeButton;
+	private ActionButton discardButton;
 	
 	public ActionButtonContainer() {
 		buttons = createActionButtons();
@@ -27,6 +28,8 @@ public class ActionButtonContainer {
 		buttons.add(cancelButton);
 		offerTradeButton = createOfferTradeButton();
 		buttons.add(offerTradeButton);
+		discardButton = createDiscardButton();
+		buttons.add(discardButton);
 	}
 	
 	public ActionButton mouseClicked(Point p) {
@@ -107,6 +110,10 @@ public class ActionButtonContainer {
 		this.offerTradeButton.setActive(player.hasAnyCardsSelected() && tp.hasAnyCardsSelected());
 	}
 	
+	public void validateDiscardButton(Player player) {
+		this.discardButton.setActive(player.getHand().size() / 2 == player.getHand().selectedSize());
+	}
+	
 	public void validatePlayDevelopmentCardButton(Player player, TurnManager tm) {
 		boolean cardSelected = player.hasPlayableDevCardSelected();
 		boolean nonePlayedYet = !tm.hasDevCardBeenPlayedThisTurn();
@@ -155,12 +162,20 @@ public class ActionButtonContainer {
 		offerTradeButton.setHidden(false);
 	}
 	
+	public void showDiscardButton() {
+		for(ActionButton button : buttons) {
+			button.setHidden(true);
+		}
+		discardButton.setHidden(false);
+	}
+	
 	public void hideNonStandardButtons() {
 		for(ActionButton button : buttons) {
 			button.setHidden(false);
 		}
 		cancelButton.setHidden(true);
 		offerTradeButton.setHidden(true);
+		discardButton.setHidden(true);
 	}
 	
 	private ActionButton createCancelButton() {
@@ -171,6 +186,12 @@ public class ActionButtonContainer {
 	
 	private ActionButton createOfferTradeButton() {
 		ActionButton b = new ActionButton("Offer Trade", Action.OfferTrade, new Point(START_X + ActionButton.BUTTON_WIDTH + BUTTON_GAP, START_Y));
+		b.setHidden(true);
+		return b;
+	}
+	
+	private ActionButton createDiscardButton() {
+		ActionButton b = new ActionButton("Discard", Action.Discard, new Point(START_X, START_Y));
 		b.setHidden(true);
 		return b;
 	}

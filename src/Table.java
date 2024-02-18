@@ -56,8 +56,8 @@ public class Table {
 		ActionButton button = this.buttonContainer.mouseClicked(p);
 		
 		// Selecting cards
-		if(stateManager.getActionState() == ActionState.YourTurn || stateManager.getActionState() == ActionState.ProposingTrade) {
-			this.turnManager.getCurrentPlayer().mouseClicked(p, buttonContainer, turnManager);
+		if(stateManager.getActionState() == ActionState.YourTurn || stateManager.getActionState() == ActionState.ProposingTrade || stateManager.getActionState() == ActionState.Discarding) {
+			user.mouseClicked(p, buttonContainer, turnManager);
 		}
 		
 		// Clicking on a player
@@ -85,14 +85,14 @@ public class Table {
 					//this.buttonContainer.setAllInactive();
 				}
 				break;
-			case OponentsTurn:
+			case OpponentsTurn:
 				break;
 			case PreRoll:
 				if(button != null) {
 					handleButtonClick(button.getAction());
 					
 					// If we roll a 7 we SHOULD NOT wrapUp()
-					if(stateManager.getActionState() != ActionState.MovingRobber) {
+					if(stateManager.getActionState() != ActionState.MovingRobber && stateManager.getActionState() != ActionState.Discarding) {
 						wrapUp();
 					} else {
 						this.party.validateTradeButtons(null);
@@ -129,6 +129,14 @@ public class Table {
 					}
 				}
 				break;
+				
+			case Discarding:
+				buttonContainer.validateDiscardButton(user);
+				if(button != null && button.getAction() == Action.Discard) {
+					handleButtonClick(button.getAction());
+				}
+				break;
+				
 			case MovingRobber:
 				if(tile != null && board.canMoveRobberHere(tile)) {
 					ArrayList<Player> playersOnRobbedTile = board.moveRobberHere(tile);
@@ -241,7 +249,7 @@ public class Table {
 	}
 	
 	private void handleButtonClick(Action action) {
-		if(action != Action.ExchangeCards && action != Action.OfferTrade) {
+		if(action != Action.ExchangeCards && action != Action.OfferTrade && action != Action.Discard) {
 			turnManager.getCurrentPlayer().unSelectHand();
 		}
 		
@@ -289,7 +297,7 @@ public class Table {
 						this.stateManager.clearActionState();
 						this.buttonContainer.setButtonsForInitialSettlement();
 					} else {
-						this.stateManager.setActionState(ActionState.OponentsTurn);
+						this.stateManager.setActionState(ActionState.OpponentsTurn);
 						this.buttonContainer.setAllInactive();
 					}
 					
@@ -310,7 +318,7 @@ public class Table {
 				break;
 			case DoneWithTurn:
 				this.turnManager.getCurrentPlayer().unSelectDevCards();
-				this.stateManager.setActionState(ActionState.OponentsTurn);
+				this.stateManager.setActionState(ActionState.OpponentsTurn);
 				this.turnManager.nextPlayersTurn();
 				
 				buttonContainer.validateButtons(turnManager.getCurrentPlayer(), board, stateManager, turnManager);
@@ -329,6 +337,18 @@ public class Table {
 				wrapUp();
 			
 				break;
+				
+			case Discard:
+				user.discardSelectedCards();
+				if(turnManager.getCurrentPlayer() == user) {
+					this.stateManager.setActionState(ActionState.MovingRobber);
+					
+				} else {
+					this.stateManager.setActionState(ActionState.OpponentsTurn);
+				}
+				
+				this.buttonContainer.hideNonStandardButtons();
+				this.buttonContainer.setAllInactive();
 				
 			default:
 				break;
@@ -354,10 +374,10 @@ public class Table {
 	}
 	
 	public void takeAITurnIfApplicable() {
-		if(stateManager.getActionState() == ActionState.OponentsTurn) {
+		if(stateManager.getActionState() == ActionState.OpponentsTurn) {
 			Player p = turnManager.getCurrentPlayer();
 			if(p instanceof PlayerAI) {
-				if(((PlayerAI) p).takeTurn(board, dice)) {
+				if(((PlayerAI) p).takeTurn(board, dice, stateManager)) {
 					System.out.println("Turn over");
 					turnManager.nextPlayersTurn();
 				}
@@ -373,14 +393,28 @@ public class Table {
 			}
 			
 			party.updateScores(board);
+		} else if(turnManager.getCurrentPlayer() != user && stateManager.getActionState() == ActionState.Discarding) {
+			party.discardIfNeeded();
+			if(!user.hasTooManyCards()) {
+				stateManager.setActionState(ActionState.OpponentsTurn);
+			} else {
+				buttonContainer.showDiscardButton();
+			}
 		}
 	}
 	
 	private void rollDice() {
 		int diceRoll = this.dice.roll();
 		if(diceRoll == 7) {
-			this.stateManager.setActionState(ActionState.MovingRobber);
-			this.buttonContainer.setAllInactive();
+			party.discardIfNeeded();
+			if(turnManager.getCurrentPlayer().hasTooManyCards()) {
+				this.stateManager.setActionState(ActionState.Discarding);
+				this.buttonContainer.showDiscardButton();
+				System.out.println("we should be discarding");
+			} else {
+				this.stateManager.setActionState(ActionState.MovingRobber);
+				this.buttonContainer.setAllInactive();
+			}
 		} else {
 			this.board.distributeResources(diceRoll);
 		}

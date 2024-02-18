@@ -10,6 +10,10 @@ public class Hand {
 	public Hand() {
 		cards = new ArrayList<ResourceCard>();
 		this.handGui = new HandGui(this);
+		
+		for(int i = 0; i < 10; i++) {
+			cards.add(new ResourceCard(Resource.Wood));
+		}
 	}
 	
 	public boolean isEmpty() {
@@ -61,6 +65,16 @@ public class Hand {
 	
 	public int size() {
 		return this.cards.size();
+	}
+	
+	public int selectedSize() {
+		int selected = 0;
+		for(ResourceCard card : cards) {
+			if(card.isSelected()) {
+				selected++;
+			}
+		}
+		return selected;
 	}
 	
 	public void clearSelection() {
@@ -212,14 +226,18 @@ public class Hand {
 	}
 	
 	public void exchangeSelectedCards(Resource r) {
+		removeSelectedCards();
+		cards.add(new ResourceCard(r));
+		sortCards();
+	}
+	
+	public void removeSelectedCards() {
 		for(int i = 0; i < cards.size(); i++) {
 			if(cards.get(i).isSelected()) {
 				cards.remove(i);
 				i--;
 			}
 		}
-		cards.add(new ResourceCard(r));
-		sortCards();
 	}
 	
 	public boolean canFulfillTrade(ArrayList<ResourceCard> desiredCards) {

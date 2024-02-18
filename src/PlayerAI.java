@@ -36,13 +36,22 @@ public class PlayerAI extends Player {
 		return offeredCards.size() > desiredCards.size();
 	}
 	
+	public void discardCardsAI() {
+		if(hasTooManyCards()) {
+			int discardAmount = this.getHand().size() / 2;
+			for(int i = 0; i < discardAmount; i++) {
+				this.getHand().removeRandomCard();
+			}
+		}
+	}
+	
 	/*
 	 * Return true if turn is done, false otherwise
 	 */
-	public boolean takeTurn(Board board, Dice dice) {		
+	public boolean takeTurn(Board board, Dice dice, StateManager sm) {		
 		// Do first thing
 		AIAction todo = thingsToDo.remove(0);
-		while(!takeAction(todo, board, dice) && !thingsToDo.isEmpty()) {
+		while(!takeAction(todo, board, dice, sm) && !thingsToDo.isEmpty()) {
 			todo = thingsToDo.remove(0);
 		}
 		
@@ -58,7 +67,7 @@ public class PlayerAI extends Player {
 		return false;
 	}
 	
-	private boolean takeAction(AIAction todo, Board board, Dice dice) {
+	private boolean takeAction(AIAction todo, Board board, Dice dice, StateManager sm) {
 		
 		switch(todo) {
 		case BuildInitialSettlement:
@@ -67,7 +76,7 @@ public class PlayerAI extends Player {
 			buildInitialRoadAI(this.lastInitialSettlement);
 			return true;
 		case RollDice:
-			rollDiceAI(dice, board);
+			rollDiceAI(dice, board, sm);
 			return true;
 		case BuildCity:
 			return buildCityAI(board);
@@ -75,6 +84,9 @@ public class PlayerAI extends Player {
 			return buildSettlementAI(board);
 		case BuildRoad:
 			return buildRoadAI(board);
+		case MoveRobber:
+			moveRobberAI(board);
+			return true;
 		}
 		
 		
@@ -212,10 +224,11 @@ public class PlayerAI extends Player {
  		this.buildRoad(best, true);
  	}
 	
-	private void rollDiceAI(Dice dice, Board board) {
+	private void rollDiceAI(Dice dice, Board board, StateManager sm) {
 		int diceRoll = dice.roll();
 		if(diceRoll == 7) {
-			moveRobberAI(board);
+			sm.setActionState(ActionState.Discarding);
+			this.thingsToDo.add(0, AIAction.MoveRobber);
 		} else {
 			board.distributeResources(diceRoll);
 		}
